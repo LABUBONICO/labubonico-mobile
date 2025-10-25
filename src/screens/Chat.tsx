@@ -44,32 +44,30 @@ const Chat = () => {
 
     return (
         <View style={styles.container}>
+            <View style={styles.containerList}>
+                <View style={styles.containerText}>
+                    <Text style={styles.title}>LABUBONICO</Text>
+                    <Text style={styles.introText}>Peças dicas de como economizar, relatórios dos seus gastos, faça sua lista de mercado e muito mais.</Text>
+                </View>
+                {
+                    isLoading ? <ActivityIndicator size={"large"} /> : <></>
+                }
+                {
+                    isChat ?
+                        <FlatList
+                            data={messages}
+                            showsVerticalScrollIndicator={false}
+                            showsHorizontalScrollIndicator={false}
+                            renderItem={({ item }) =>
+                                <ChatMessage
+                                    date={item.date}
+                                    origin={item.origin}
+                                    message={item.message}
+                                />}
+                        /> : <></>
 
-            {
-                isLoading ?
-                    <ActivityIndicator size={"large"} /> :
-                    <View style={styles.containerList}>
-                        {
-                            isChat ?
-                                <FlatList
-                                    data={messages}
-                                    showsVerticalScrollIndicator={false}
-                                    showsHorizontalScrollIndicator={false}
-                                    contentContainerStyle={styles.containerList}
-                                    renderItem={({ item }) =>
-                                        <ChatMessage
-                                            date={item.date}
-                                            origin={item.origin}
-                                            message={item.message}
-                                        />}
-                                /> :
-                                <View style={styles.containerText}>
-                                    <Text style={styles.title}>LABUBONICO</Text>
-                                    <Text style={styles.introText}>Peças dicas de como economizar, relatórios dos seus gastos, faça sua lista de mercado e muito mais.</Text>
-                                </View>
-                        }
-                    </View>
-            }
+                }
+            </View>
 
             <View style={styles.containerRow}>
                 <TouchableOpacity>
@@ -79,6 +77,7 @@ const Chat = () => {
                 <TextInput
                     autoFocus={true}
                     style={styles.input}
+                    value={prompt.message}
                     placeholder='Peça ao Labubonico'
                     onChangeText={value => handlerPrompt('message', value)}
                 />

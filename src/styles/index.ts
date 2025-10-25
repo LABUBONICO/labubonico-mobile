@@ -23,10 +23,10 @@ const styles = StyleSheet.create({
   },
   containerList: {
     flex: 1,
+    width: "100%",
     paddingTop: 20,
     paddingInline: 6,
     paddingBottom: 80,
-    
   },
   screen: {
     flex: 1,
