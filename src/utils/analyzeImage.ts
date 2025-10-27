@@ -1,3 +1,5 @@
+import * as firestore from "firebase/firestore";
+import { recipties } from "../api/firestore";
 import { ChatSession } from "firebase/ai";
 import { imageToJsonModel } from "../api/firebaseConfig";
 
@@ -18,7 +20,7 @@ const analyzeImage = async (base64: string, chat: ChatSession) => {
 
 const extractImageDataToJson = async (base64: string) => {
     const result = await imageToJsonModel.generateContent([
-        {text: "Crie um json baseado nas informações do comprovante."},
+        { text: "Crie um json baseado nas informações do comprovante." },
         {
             inlineData: {
                 mimeType: "image/jpeg",
@@ -27,8 +29,9 @@ const extractImageDataToJson = async (base64: string) => {
         }
     ]);
 
-    const response = result.response.text();
-    console.log(response);
+    const doc = JSON.parse(result.response.text());
+
+    await firestore.addDoc(recipties, doc);
 }
 
 export {
