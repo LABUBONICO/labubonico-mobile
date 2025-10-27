@@ -4,8 +4,8 @@ import { model } from '../api/firebaseConfig';
 import { Message } from '../types';
 import { Ionicons } from '@expo/vector-icons';
 import { pickImage } from "../utils/pickImage";
-import { analyzeImage } from "../utils/analyzeImage";
 import { useRef, useState } from 'react';
+import { analyzeImage, extractImageDataToJson } from "../utils/analyzeImage";
 import { ActivityIndicator, FlatList, Text, TextInput, TouchableOpacity, View } from "react-native"
 
 const Chat = () => {
@@ -80,6 +80,9 @@ const Chat = () => {
 
         try {
             const response = await analyzeImage(imagePicked.base64!, chatRef.current);
+
+            await extractImageDataToJson(imagePicked.base64!);
+
             setMessages((prev) => [...prev, {
                 role: "agent",
                 type: "message",
@@ -118,9 +121,11 @@ const Chat = () => {
                         /> : <></>
 
                 }
-                <View style={{ padding: 10 }}>
-                    {isLoading ? <ActivityIndicator size={"large"} /> : <></>}
-                </View>
+
+            </View>
+            
+            <View style={{ padding: 10 }}>
+                {isLoading ? <ActivityIndicator size={"large"} /> : <></>}
             </View>
 
             <View style={styles.containerRow}>

@@ -15,8 +15,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
     justifyContent: "center",
-    position: "absolute",
-    bottom: 0,
   },
   containerText: {
     marginBottom: 20,
@@ -27,7 +25,6 @@ const styles = StyleSheet.create({
     width: "100%",
     paddingTop: 20,
     paddingInline: 6,
-    paddingBottom: 80,
   },
   screen: {
     flex: 1,

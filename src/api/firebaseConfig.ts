@@ -1,7 +1,24 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import { getAI, getGenerativeModel, GoogleAIBackend } from "firebase/ai";
+import { initializeApp } from "firebase/app";
+import { getAI, getGenerativeModel, GoogleAIBackend, Schema } from "firebase/ai";
+
+const imageToJsonSchema = Schema.object({
+    properties: {
+        id: Schema.string(),
+        price: Schema.number(),
+        local: Schema.string(),
+        category: Schema.string(),
+        timestamp: Schema.string(),
+        items: Schema.array({
+            items: Schema.object({
+                properties: {
+                    name: Schema.string(),
+                }
+            })
+        })
+    }, optionalProperties: ["items"],
+});
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -31,4 +48,12 @@ const model = getGenerativeModel(ai, {
     systemInstruction: "Você é um assistente financeiro. Seu nome é Labubonico. Responda sempre em português brasileiro. Ignore imagens fornecidas que não sejam de comprovantes financeiros",
 })
 
-export { database, model }
+const imageToJsonModel = getGenerativeModel(ai, {
+    model: "gemini-2.5-flash", 
+    generationConfig: {
+        responseMimeType: "application/json",
+        responseSchema: imageToJsonSchema,
+    }
+})
+
+export { database, model, imageToJsonModel }

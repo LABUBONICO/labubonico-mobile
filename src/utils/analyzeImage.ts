@@ -1,16 +1,37 @@
 import { ChatSession } from "firebase/ai";
+import { imageToJsonModel } from "../api/firebaseConfig";
 
-export async function analyzeImage(base64: string, chat: ChatSession) {
-  const result = await chat.sendMessage([
-    { text: "Identifique as informações (Valor, Categoria, Data e Hora, Bandeira do cartão) dos comprovantes fornecidos e diga que serão computados" },
-    {
-      inlineData: {
-        mimeType: "image/jpeg",
-        data: base64,
-      },
-    },
-  ]);
+const analyzeImage = async (base64: string, chat: ChatSession) => {
+    const result = await chat.sendMessage([
+        { text: "Identifique e categorize resumidamente as informações dos comprovantes fornecidos e diga que serão computados" },
+        {
+            inlineData: {
+                mimeType: "image/jpeg",
+                data: base64,
+            },
+        },
+    ]);
 
-  const response = result.response.text();
-  return response;
+    const response = result.response.text();
+    return response;
+}
+
+const extractImageDataToJson = async (base64: string) => {
+    const result = await imageToJsonModel.generateContent([
+        {text: "Crie um json baseado nas informações do comprovante."},
+        {
+            inlineData: {
+                mimeType: "image/jpeg",
+                data: base64,
+            }
+        }
+    ]);
+
+    const response = result.response.text();
+    console.log(response);
+}
+
+export {
+    analyzeImage,
+    extractImageDataToJson,
 }
