@@ -3,7 +3,9 @@ import ChatMessage from "../components/ChatMessage";
 import { model } from '../api/firebaseConfig';
 import { Message } from '../types';
 import { Ionicons } from '@expo/vector-icons';
-import { useState } from 'react';
+import { pickImage } from "../utils/pickImage";
+import { analyzeImage } from "../utils/analyzeImage";
+import { useRef, useState } from 'react';
 import { ActivityIndicator, FlatList, Text, TextInput, TouchableOpacity, View } from "react-native"
 
 const Chat = () => {
@@ -11,6 +13,19 @@ const Chat = () => {
     const [isChat, setIsChat] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [messages, setMessages] = useState<Message[]>([]);
+
+    const chatRef = useRef(
+        model.startChat({
+            history: [
+                {
+                    role: "user",
+                    parts: [
+                        { text: "Você é um assistente que analisa comprovantes e responde perguntas sobre finanças somente." }
+                    ]
+                }
+            ]
+        })
+    );
 
     const handlerPrompt = (field: keyof Message, value: string | Date) => {
         setPrompt(prev => ({ ...prev, [field]: value }));
@@ -22,22 +37,58 @@ const Chat = () => {
             setIsLoading(true);
 
             setMessages(prev => [...prev, {
-                origin: "user",
-                message: prompt.message,
-                date: new Date().toISOString(),
+                type: "message",
+                role: "user",
+                content: prompt.content,
+                timestamp: new Date().toISOString(),
             }]);
 
-            const result = await model.generateContent(prompt.message);
+            const result = await chatRef.current.sendMessage(prompt.content);
 
             setMessages(prev => [...prev, {
-                origin: "agent",
-                date: new Date().toISOString(),
-                message: result.response.text(),
+                type: "message",
+                role: "agent",
+                content: result.response.text(),
+                timestamp: new Date().toISOString(),
             }]);
         } catch (error) {
             console.log(error);
         } finally {
-            handlerPrompt('message', "");
+            handlerPrompt('content', "");
+            setIsLoading(false);
+        }
+    }
+
+    const handlerPick = async () => {
+        setIsChat(true);
+        setIsLoading(true);
+
+        const imagePicked = await pickImage();
+
+        if (!imagePicked) {
+            setIsLoading(false);
+            return;
+        }
+
+        setMessages((prev) => [...prev, {
+            role: "user",
+            type: "image",
+            content: "imagem",
+            imageUri: imagePicked.uri,
+            timestamp: Date.now().toString(),
+        }]);
+
+        try {
+            const response = await analyzeImage(imagePicked.base64!, chatRef.current);
+            setMessages((prev) => [...prev, {
+                role: "agent",
+                type: "message",
+                content: response ? response : "Não foi possivel analizar a imagem",
+                timestamp: Date.now().toString(),
+            }]);
+        } catch (err) {
+            console.error(err);
+        } finally {
             setIsLoading(false);
         }
     }
@@ -50,36 +101,39 @@ const Chat = () => {
                     <Text style={styles.introText}>Peças dicas de como economizar, relatórios dos seus gastos, faça sua lista de mercado e muito mais.</Text>
                 </View>
                 {
-                    isLoading ? <ActivityIndicator size={"large"} /> : <></>
-                }
-                {
                     isChat ?
                         <FlatList
                             data={messages}
+                            keyExtractor={(item) => item.timestamp}
                             showsVerticalScrollIndicator={false}
                             showsHorizontalScrollIndicator={false}
                             renderItem={({ item }) =>
                                 <ChatMessage
-                                    date={item.date}
-                                    origin={item.origin}
-                                    message={item.message}
+                                    type={item.type}
+                                    role={item.role}
+                                    content={item.content}
+                                    timestamp={item.timestamp}
+                                    imageUri={item.imageUri}
                                 />}
                         /> : <></>
 
                 }
+                <View style={{ padding: 10 }}>
+                    {isLoading ? <ActivityIndicator size={"large"} /> : <></>}
+                </View>
             </View>
 
             <View style={styles.containerRow}>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={handlerPick}>
                     <Ionicons name='attach' style={styles.buttonIcon} size={30} color="#000" />
                 </TouchableOpacity>
 
                 <TextInput
                     autoFocus={true}
                     style={styles.input}
-                    value={prompt.message}
+                    value={prompt.content}
                     placeholder='Peça ao Labubonico'
-                    onChangeText={value => handlerPrompt('message', value)}
+                    onChangeText={value => handlerPrompt('content', value)}
                 />
 
                 <TouchableOpacity onPress={handlerSender}>

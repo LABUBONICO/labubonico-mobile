@@ -1,7 +1,9 @@
 type Message = {
-    date: string,
-    origin: string,
-    message: string,
+    type: "message" | "image",
+    role: "user" | "agent",
+    content: string,
+    timestamp: string,
+    imageUri?: string | undefined;
 }
 
 export {

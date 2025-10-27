@@ -19,6 +19,7 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   containerText: {
+    marginBottom: 20,
     alignItems: "center",
   },
   containerList: {
@@ -44,8 +45,8 @@ const styles = StyleSheet.create({
     borderRadius: 50,
   },
   title: {
-    margin: 30,
     fontSize: 30,
+    marginBottom: 15,
     fontWeight: "bold",
   },
   introText: {
