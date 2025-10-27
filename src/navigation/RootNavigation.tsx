@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import MainStack from "./MainStack";
-import AuthStack from "./AuthStack";
+import { AuthContext } from "../contexts/AuthContext";
+import Login from "../screens/Login";
 
 const RootNavigation = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
-  return <>{isAuthenticated ? <MainStack /> : <AuthStack />}</>;
+  const { user } = useContext(AuthContext);
+  return user ? <MainStack /> : <Login />;
 };
 
 export default RootNavigation;

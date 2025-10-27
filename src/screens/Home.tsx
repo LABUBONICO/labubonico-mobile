@@ -1,6 +1,6 @@
 import { Text, View } from "react-native";
 import styles from "../styles";
-import { MainStackParamList } from "../types/Navigation";
+import { MainStackParamList } from "../types/navigation";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 const Home = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
