@@ -5,10 +5,7 @@ import { Message } from "../types";
 import { Ionicons } from "@expo/vector-icons";
 import { pickImage } from "../utils/pickImage";
 import { useRef, useState } from "react";
-import {
-  analyzeImageWithConfidence,
-  extractImageDataToJson,
-} from "../utils/analyzeImage";
+import { extractImageDataToJson } from "../utils/analyzeImage";
 import {
   ActivityIndicator,
   FlatList,
@@ -100,29 +97,16 @@ const Chat = () => {
     ]);
 
     try {
-      const analysis = await analyzeImageWithConfidence(
-        imagePicked.base64!,
-        chatRef.current
-      );
-      let response = "";
-
-      if (!analysis.confidence || !analysis.precision) return null;
-
-      if (analysis.confidence > 8 && analysis.precision > 8) {
-        await extractImageDataToJson(imagePicked.base64!);
-        response = analysis.analysis;
-      } else {
-        response =
-          "Imagem muito borrada/má qualidade, por favor, tente novamente.";
-        console.log(analysis.rawResponse);
-      }
+      const response = await extractImageDataToJson(imagePicked.base64!);
 
       setMessages((prev) => [
         ...prev,
         {
           role: "agent",
           type: "message",
-          content: response ? response : "Não foi possivel analizar a imagem",
+          content: response
+            ? JSON.stringify(response)
+            : "Não foi possivel analizar a imagem",
           timestamp: Date.now().toString(),
         },
       ]);
@@ -168,15 +152,6 @@ const Chat = () => {
       </View>
 
       <View style={styles.containerRow}>
-        <TouchableOpacity onPress={handlerPick}>
-          <Ionicons
-            name="attach"
-            style={styles.buttonIcon}
-            size={30}
-            color="#000"
-          />
-        </TouchableOpacity>
-
         <TextInput
           autoFocus={true}
           style={styles.input}
@@ -186,12 +161,10 @@ const Chat = () => {
         />
 
         <TouchableOpacity
-          onPress={handlerSender}
-          disabled={!prompt.content}
-          style={{ opacity: !prompt.content ? 0.5 : 1 }}
+          onPress={prompt.content ? handlerSender : handlerPick}
         >
           <Ionicons
-            name="send"
+            name={prompt.content ? "send" : "attach"}
             style={styles.buttonIcon}
             size={30}
             color="#000"

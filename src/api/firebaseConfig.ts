@@ -20,6 +20,7 @@ const imageToJsonSchema = Schema.object({
       items: Schema.object({
         properties: {
           name: Schema.string(),
+          price: Schema.number(),
         },
       }),
     }),
