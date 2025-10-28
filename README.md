@@ -9,12 +9,14 @@ Labubonico é uma solução moderna para gestão de finanças pessoais que elimi
 ### ✨ Funcionalidades Principais
 
 - **📸 Captura Inteligente de Documentos**
+
   - Tire fotos de comprovantes e recibos físicos
   - Envie documentos digitais gerados por apps bancários
   - Reconhecimento automático de valores, datas e categorias
   - Processamento instantâneo com IA para extração de dados
 
 - **🤖 Chatbot Financeiro Inteligente**
+
   - Converse naturalmente sobre suas finanças
   - Perguntas como "Qual foi meu maior gasto esse mês?"
   - Análise de gastos recorrentes e padrões de consumo
@@ -30,10 +32,12 @@ Labubonico é uma solução moderna para gestão de finanças pessoais que elimi
 ## 🛠️ Tecnologias Utilizadas
 
 ### Frontend
+
 - **Expo** - Framework para desenvolvimento React Native
 - **TypeScript** - Tipagem estática e melhor experiência de desenvolvimento
 
 ### Backend & Serviços
+
 - **Firebase Authentication** - Autenticação segura de usuários
 - **Cloud Firestore** - Banco de dados em tempo real e escalável
 - **Firebase AI Logic** - Processamento inteligente de documentos e chatbot
@@ -42,6 +46,7 @@ Labubonico é uma solução moderna para gestão de finanças pessoais que elimi
 ## 🚀 Como Começar
 
 ### Pré-requisitos
+
 ```bash
 node >= 18.0.0
 npm ou yarn
@@ -51,12 +56,14 @@ expo-cli
 ### Instalação
 
 1. Clone o repositório
+
 ```bash
 git clone https://github.com/LABUBONICO/labubonico-mobile.git
 cd labubonico-mobile
 ```
 
 2. Instale as dependências
+
 ```bash
 npm install
 # ou
@@ -66,6 +73,7 @@ yarn install
 3. Configure as variáveis de ambiente
 
 Crie um arquivo `.env` na raiz do projeto:
+
 ```env
 EXPO_PUBLIC_FIREBASE_API_KEY=sua_api_key
 EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=seu_auth_domain
@@ -73,14 +81,56 @@ EXPO_PUBLIC_FIREBASE_PROJECT_ID=seu_project_id
 EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=seu_storage_bucket
 EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=seu_sender_id
 EXPO_PUBLIC_FIREBASE_APP_ID=seu_app_id
+EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID=seu_google_web_client_id
 ```
 
 4. Inicie o projeto
+
 ```bash
 npx start
 ```
 
+## ⚙️ Configurações Importantes
+
+### Google Sign-In Setup
+
+Para usar o **Google Sign-In** com sucesso, você precisará:
+
+1. **Usar Prebuild (Obrigatório)**
+
+   - O Google Sign-In requer código nativo que não pode ser executado com Expo Go
+   - Use o seguinte comando para criar um build précompilado:
+
+   ```bash
+   npx expo prebuild --clean
+   ```
+
+   - Depois, execute com:
+
+   ```bash
+   npx expo run:android
+   # ou
+   npx expo run:ios
+   ```
+
+2. **Descomente o código no AuthContext.tsx**
+
+   - Abra `src/contexts/AuthContext.tsx`
+   - Descomente os comentários relacionados ao Google Sign-In (import, configuração e função loginWithGoogle)
+   - O código está marcado com comentários `/* ... */` para facilitar a identificação
+
+3. **Configure as credenciais do Google**
+   - Obtenha seu `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` no [Google Cloud Console](https://console.cloud.google.com/)
+   - Adicione a variável ao arquivo `.env`
+
+### Notas Técnicas
+
+- **Expo Go Limitation**: O Google Sign-In não funciona com Expo Go devido aos requisitos de código nativo
+- **Build Preview**: Sempre use o Expo Preview (iOS) ou Android build para testar autenticação com Google
+- **Firebase Auth**: A autenticação via Email/Senha funciona tanto com Expo Go quanto com builds precompilados
+
 ## 📁 Estrutura do Projeto
+
 ```
 labubonico/
 ├── src/

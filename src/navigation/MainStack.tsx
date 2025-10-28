@@ -5,7 +5,7 @@ import Chat from "../screens/Chat";
 import Camera from "../screens/Camera";
 import Details from "../screens/Details";
 import Profile from "../screens/Profile";
-import { MainStackParamList } from "../types/Navigation";
+import { MainStackParamList } from "../types/navigation";
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
 
