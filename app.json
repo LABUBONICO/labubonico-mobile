@@ -28,9 +28,9 @@
     },
     "plugins": [
       [
-        "expo-image-picker",
+        "expo-document-picker",
         {
-          "photosPermission": "The app accesses your photos to let you share them with your friends."
+          "iCloudContainerEnvironment": "Production"
         }
       ]
     ]

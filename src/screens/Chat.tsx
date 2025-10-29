@@ -3,7 +3,6 @@ import ChatMessage from "../components/ChatMessage";
 import { model } from "../api/firebaseConfig";
 import { Message } from "../types";
 import { Ionicons } from "@expo/vector-icons";
-import { pickImage } from "../utils/pickImage";
 import { useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -14,14 +13,16 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import * as ImagePicker from "expo-image-picker";
+import * as DocumentPicker from "expo-document-picker";
 
 const Chat = () => {
   const [input, setInput] = useState<string>("");
   const [isChat, setIsChat] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [file, setFile] = useState<ImagePicker.ImagePickerAsset | null>(null);
+  const [file, setFile] = useState<DocumentPicker.DocumentPickerResult | null>(
+    null
+  );
 
   const chatRef = useRef(
     model.startChat({
@@ -30,7 +31,10 @@ const Chat = () => {
   );
 
   const handlerFilePick = async () => {
-    const imagePicked = await pickImage();
+    const imagePicked = await DocumentPicker.getDocumentAsync({
+      type: ["image/*", "application/pdf"],
+      copyToCacheDirectory: true,
+    });
     setFile(imagePicked);
   };
 
@@ -43,18 +47,31 @@ const Chat = () => {
       {
         role: "user",
         content: input,
-        imageUri: file?.uri,
+        file: file?.assets?.[0]
+          ? {
+              uri: file.assets[0].uri,
+              mimeType: file.assets[0].mimeType,
+              name: file.assets[0].name,
+            }
+          : undefined,
         timestamp: Date.now().toString(),
       },
     ]);
     try {
       const messageParts: any[] = [{ text: input }];
 
-      if (file?.base64) {
+      if (file?.assets?.[0]?.base64) {
+        const mimeType = file.assets[0].mimeType || "image/jpeg";
+        // Remove data URI prefix if present (e.g., "data:application/pdf;base64,...")
+        const base64Data = file.assets[0].base64.replace(
+          /^data:[^;]+;base64,/,
+          ""
+        );
+
         messageParts.push({
           inlineData: {
-            mimeType: "image/jpeg",
-            data: file.base64,
+            mimeType: mimeType,
+            data: base64Data,
           },
         });
       }
@@ -92,7 +109,7 @@ const Chat = () => {
                 role={item.role}
                 content={item.content}
                 timestamp={item.timestamp}
-                imageUri={item.imageUri}
+                file={item.file}
               />
             )}
           />
@@ -128,7 +145,7 @@ const Chat = () => {
             <Ionicons name="attach" size={30} color="#000" />
           ) : (
             <Image
-              source={{ uri: file.uri! }}
+              source={{ uri: file.assets?.[0].uri! }}
               style={{ width: "100%", height: "100%", borderRadius: 100 }}
             />
           )}

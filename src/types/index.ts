@@ -2,7 +2,11 @@ type Message = {
   role: "user" | "agent";
   content: string;
   timestamp: string;
-  imageUri?: string | undefined;
+  file?: {
+    uri: string;
+    mimeType?: string;
+    name?: string;
+  };
 };
 
 type JSONResponse = {

@@ -61,7 +61,7 @@ const ai = getAI(app, { backend: new GoogleAIBackend() });
 const model = getGenerativeModel(ai, {
   model: "gemini-2.5-flash",
   systemInstruction:
-    "Você é um assistente financeiro. Seu nome é Labubonico. Responda sempre em português brasileiro. Ignore imagens fornecidas que não sejam de comprovantes financeiros",
+    "Você é um assistente financeiro. Seu nome é Labubonico. Responda sempre em português brasileiro. Ignore imagens ou PDFs fornecidos que não sejam de comprovantes financeiros",
 });
 
 const imageToJsonModel = getGenerativeModel(ai, {
