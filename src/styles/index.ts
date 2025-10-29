@@ -3,9 +3,9 @@ import { StyleSheet } from "react-native";
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#f1f1f1',
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#f1f1f1",
   },
   containerRow: {
     gap: 10,
@@ -37,9 +37,13 @@ const styles = StyleSheet.create({
     borderColor: "#000",
   },
   buttonIcon: {
-    padding: 10,
     borderWidth: 1,
     borderRadius: 50,
+    width: 50,
+    height: 50,
+    alignItems: "center",
+    justifyContent: "center",
+    borderColor: "#000",
   },
   title: {
     fontSize: 30,
@@ -49,7 +53,7 @@ const styles = StyleSheet.create({
   introText: {
     width: "60%",
     textAlign: "center",
-    color: "#00000065"
+    color: "#00000065",
   },
   messageUser: {
     margin: 10,
@@ -60,7 +64,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignSelf: "flex-end",
     borderColor: "#00000080",
-    backgroundColor: "#fff"
+    backgroundColor: "#fff",
   },
   messageAgent: {
     margin: 10,
@@ -75,7 +79,7 @@ const styles = StyleSheet.create({
   },
   icon: {
     padding: 25,
-  }
+  },
 });
 
 export default styles;

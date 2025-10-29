@@ -5,108 +5,67 @@ import { Message } from "../types";
 import { Ionicons } from "@expo/vector-icons";
 import { pickImage } from "../utils/pickImage";
 import { useRef, useState } from "react";
-import { extractImageDataToJson } from "../utils/analyzeImage";
 import {
   ActivityIndicator,
   FlatList,
+  Image,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import * as ImagePicker from "expo-image-picker";
 
 const Chat = () => {
-  const [prompt, setPrompt] = useState<Message>({} as Message);
+  const [input, setInput] = useState<string>("");
   const [isChat, setIsChat] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [file, setFile] = useState<ImagePicker.ImagePickerAsset | null>(null);
 
   const chatRef = useRef(
     model.startChat({
-      history: [
-        {
-          role: "user",
-          parts: [
-            {
-              text: "Você é um assistente que analisa comprovantes e responde perguntas sobre finanças somente.",
-            },
-          ],
-        },
-      ],
+      history: [],
     })
   );
 
-  const handlerPrompt = (field: keyof Message, value: string | Date) => {
-    setPrompt((prev) => ({ ...prev, [field]: value }));
+  const handlerFilePick = async () => {
+    const imagePicked = await pickImage();
+    setFile(imagePicked);
   };
 
-  const handlerSender = async () => {
-    try {
-      setIsChat(true);
-      setIsLoading(true);
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          type: "message",
-          role: "user",
-          content: prompt.content,
-          timestamp: new Date().toISOString(),
-        },
-      ]);
-
-      const result = await chatRef.current.sendMessage(prompt.content);
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          type: "message",
-          role: "agent",
-          content: result.response.text(),
-          timestamp: new Date().toISOString(),
-        },
-      ]);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      handlerPrompt("content", "");
-      setIsLoading(false);
-    }
-  };
-
-  const handlerPick = async () => {
+  const handlerSend = async () => {
     setIsChat(true);
     setIsLoading(true);
-
-    const imagePicked = await pickImage();
-
-    if (!imagePicked) {
-      setIsLoading(false);
-      return;
-    }
 
     setMessages((prev) => [
       ...prev,
       {
         role: "user",
-        type: "image",
-        content: "imagem",
-        imageUri: imagePicked.uri,
+        content: input,
+        imageUri: file?.uri,
         timestamp: Date.now().toString(),
       },
     ]);
-
     try {
-      const response = await extractImageDataToJson(imagePicked.base64!);
+      const messageParts: any[] = [{ text: input }];
+
+      if (file?.base64) {
+        messageParts.push({
+          inlineData: {
+            mimeType: "image/jpeg",
+            data: file.base64,
+          },
+        });
+      }
+
+      const response = await chatRef.current.sendMessage(messageParts);
 
       setMessages((prev) => [
         ...prev,
         {
           role: "agent",
-          type: "message",
-          content: response
-            ? JSON.stringify(response)
-            : "Não foi possivel analizar a imagem",
+          content: response.response.text(),
           timestamp: Date.now().toString(),
         },
       ]);
@@ -114,6 +73,8 @@ const Chat = () => {
       console.error(err);
     } finally {
       setIsLoading(false);
+      setInput("");
+      setFile(null);
     }
   };
 
@@ -128,7 +89,6 @@ const Chat = () => {
             showsHorizontalScrollIndicator={false}
             renderItem={({ item }) => (
               <ChatMessage
-                type={item.type}
                 role={item.role}
                 content={item.content}
                 timestamp={item.timestamp}
@@ -148,27 +108,38 @@ const Chat = () => {
       </View>
 
       <View style={{ padding: 10 }}>
-        {isLoading ? <ActivityIndicator size={"large"} /> : <></>}
+        {isLoading && <ActivityIndicator size={"large"} />}
       </View>
 
       <View style={styles.containerRow}>
         <TextInput
           autoFocus={true}
           style={styles.input}
-          value={prompt.content}
+          value={input}
           placeholder="Peça ao Labubonico"
-          onChangeText={(value) => handlerPrompt("content", value)}
+          onChangeText={setInput}
         />
 
         <TouchableOpacity
-          onPress={prompt.content ? handlerSender : handlerPick}
+          onPress={file ? () => setFile(null) : handlerFilePick}
+          style={styles.buttonIcon}
         >
-          <Ionicons
-            name={prompt.content ? "send" : "attach"}
-            style={styles.buttonIcon}
-            size={30}
-            color="#000"
-          />
+          {!file ? (
+            <Ionicons name="attach" size={30} color="#000" />
+          ) : (
+            <Image
+              source={{ uri: file.uri! }}
+              style={{ width: "100%", height: "100%", borderRadius: 100 }}
+            />
+          )}
+        </TouchableOpacity>
+
+        {/* change to navigate to camera screen */}
+        <TouchableOpacity
+          onPress={input ? handlerSend : handlerSend}
+          style={styles.buttonIcon}
+        >
+          <Ionicons name={input ? "send" : "camera"} size={30} color="#000" />
         </TouchableOpacity>
       </View>
     </View>
