@@ -40,3 +40,7 @@ yarn-error.*
 /ios
 /android
 .env
+
+# Firebase logs
+firebase-debug.log
+firestore-debug.log
