@@ -1,5 +1,5 @@
 import * as firestore from "firebase/firestore";
-import { recipties } from "../api/firestore";
+import { receipties } from "../api/firestore";
 import { imageToJsonModel } from "../api/firebaseConfig";
 import { JSONResponse } from "../types";
 
@@ -62,7 +62,7 @@ const extractImageDataToJson = async (base64: string) => {
     timestamp: rawDoc.timestamp || "NÃO IDENTIFICADO",
     items: rawDoc.items || [],
   };
-  await firestore.addDoc(recipties, doc);
+  await firestore.addDoc(receipties, doc);
   return doc;
 };
 

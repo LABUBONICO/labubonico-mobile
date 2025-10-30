@@ -1,16 +1,16 @@
 // Import the functions you need from the SDKs you need
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getFirestore } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { initializeAuth } from "firebase/auth";
-import { getReactNativePersistence } from "firebase/auth";
 import { getAI, getGenerativeModel, GoogleAIBackend, Schema } from "firebase/ai";
 
 const imageToJsonSchema = Schema.object({
   properties: {
     extractable: Schema.number(),
     errorMessage: Schema.string(),
-    price: Schema.number(),
+    price: Schema.number({
+      description: "Para valores não definidos atribua 0.00"
+    }),
     local: Schema.string(),
     category: Schema.string(),
     timestamp: Schema.string(),
