@@ -10,10 +10,12 @@ Labubonico é uma solução moderna para gestão de finanças pessoais que elimi
 
 - **📸 Captura Inteligente de Documentos**
 
-  - Tire fotos de comprovantes e recibos físicos
+  - Tire fotos de comprovantes e recibos físicos com câmera integrada
   - Envie documentos digitais gerados por apps bancários
   - Reconhecimento automático de valores, datas e categorias
   - Processamento instantâneo com IA para extração de dados
+  - Controle de flash e preview da foto antes de enviar
+  - Validação de qualidade da imagem para melhor precisão
 
 - **🤖 Chatbot Financeiro Inteligente**
 
@@ -35,6 +37,7 @@ Labubonico é uma solução moderna para gestão de finanças pessoais que elimi
 
 - **Expo** - Framework para desenvolvimento React Native
 - **TypeScript** - Tipagem estática e melhor experiência de desenvolvimento
+- **expo-camera** - Captura de fotos e acesso à câmera do dispositivo
 
 ### Backend & Serviços
 
@@ -91,6 +94,20 @@ npx start
 ```
 
 ## ⚙️ Configurações Importantes
+
+### Camera Setup
+
+Para usar a funcionalidade de câmera, o seguinte está configurado:
+
+1. **Permissões Automáticas**
+
+   - A permissão de câmera é solicitada automaticamente quando o usuário acessa a tela de câmera
+   - A permissão de microfone também é solicitada (requerida pelo Android para captura com audio)
+
+2. **Características**
+   - Flash ligável/desligável durante a captura
+   - Preview da foto antes de enviar para análise
+   - Opções para descartar ou confirmar a foto
 
 ### Google Sign-In Setup
 

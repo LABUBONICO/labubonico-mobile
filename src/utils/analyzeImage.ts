@@ -1,10 +1,13 @@
-import * as firestore from "firebase/firestore";
-import { recipties } from "../api/firestore";
 import { imageToJsonModel } from "../api/firebaseConfig";
 import { JSONResponse } from "../types";
 
 const extractImageDataToJson = async (base64: string) => {
+  console.log("Analyzing image and extracting JSON data...");
   const categories = ["ALIMENTAÇÃO", "TRANSPORTE", "LAZER", "OUTROS"];
+
+  // Strip the data URI prefix if present (e.g., "data:image/png;base64,")
+  const cleanBase64 = base64.includes(",") ? base64.split(",")[1] : base64;
+
   const result = await imageToJsonModel.generateContent([
     {
       text: `Você é um validador rigoroso de comprovantes. Analise a qualidade da imagem e extraia informações APENAS se a qualidade for aceitável.
@@ -46,23 +49,14 @@ const extractImageDataToJson = async (base64: string) => {
     {
       inlineData: {
         mimeType: "image/jpeg",
-        data: base64,
+        data: cleanBase64,
       },
     },
   ]);
 
-  const rawDoc: JSONResponse = JSON.parse(result.response.text());
-  if (rawDoc.extractable === 0) {
-    return rawDoc.errorMessage;
-  }
-  const doc = {
-    category: rawDoc.category || "OUTROS",
-    local: rawDoc.local || "NÃO IDENTIFICADO",
-    price: rawDoc.price || "NÃO IDENTIFICADO",
-    timestamp: rawDoc.timestamp || "NÃO IDENTIFICADO",
-    items: rawDoc.items || [],
-  };
-  await firestore.addDoc(recipties, doc);
+  console.log("Image analysis complete.");
+  const doc: JSONResponse = JSON.parse(result.response.text());
+  console.log("Extracted JSON:", doc);
   return doc;
 };
 

@@ -35,8 +35,14 @@
           "iCloudContainerEnvironment": "Production"
         }
       ],
+      ["@react-native-google-signin/google-signin"],
       [
-        "@react-native-google-signin/google-signin"
+        "expo-camera",
+        {
+          "cameraPermission": "Allow labubonico to access your camera",
+          "microphonePermission": "Allow labubonico to access your microphone",
+          "recordAudioAndroid": true
+        }
       ]
     ]
   }
