@@ -28,6 +28,16 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": [["@react-native-google-signin/google-signin"]]
+    "plugins": [
+      [
+        "expo-document-picker",
+        {
+          "iCloudContainerEnvironment": "Production"
+        }
+      ],
+      [
+        "@react-native-google-signin/google-signin"
+      ]
+    ]
   }
 }
