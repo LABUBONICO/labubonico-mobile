@@ -1,14 +1,19 @@
-import { useState } from "react"
+import { useContext, useState } from "react";
+import MainStack from "./MainStack";
+import { AuthContext } from "../contexts/AuthContext";
 import Login from "../screens/Login";
-import MainBottomTabs from "./MainBottomTabs";
+import { ActivityIndicator, View } from "react-native";
 
 const RootNavigation = () => {
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
+  const { user, loadingUser } = useContext(AuthContext);
+  if (loadingUser) {
     return (
-        <>
-            {isAuthenticated ? <MainBottomTabs /> : <Login />}
-        </>
-    )
-}
+      <View>
+        <ActivityIndicator size={"large"} />
+      </View>
+    );
+  }
+  return user ? <MainStack /> : <Login />;
+};
 
 export default RootNavigation;

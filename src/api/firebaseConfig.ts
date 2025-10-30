@@ -1,12 +1,10 @@
 // Import the functions you need from the SDKs you need
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getFirestore } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
-import {
-  getAI,
-  getGenerativeModel,
-  GoogleAIBackend,
-  Schema,
-} from "firebase/ai";
+import { initializeAuth } from "firebase/auth";
+import { getReactNativePersistence } from "firebase/auth";
+import { getAI, getGenerativeModel, GoogleAIBackend, Schema } from "firebase/ai";
 
 const imageToJsonSchema = Schema.object({
   properties: {
@@ -60,8 +58,11 @@ const ai = getAI(app, { backend: new GoogleAIBackend() });
 // Create a `GenerativeModel` instance with a model that supports your use case
 const model = getGenerativeModel(ai, {
   model: "gemini-2.5-flash",
-  systemInstruction:
-    "Você é um assistente financeiro. Seu nome é Labubonico. Responda sempre em português brasileiro. Ignore imagens ou PDFs fornecidos que não sejam de comprovantes financeiros",
+  systemInstruction: `
+    Você é um assistente financeiro. 
+    Seu nome é Labubonico. 
+    Responda sempre em português brasileiro.
+    Ignore imagens ou PDFs fornecidos que não sejam de comprovantes financeiros`,
 });
 
 const imageToJsonModel = getGenerativeModel(ai, {
@@ -71,5 +72,7 @@ const imageToJsonModel = getGenerativeModel(ai, {
     responseSchema: imageToJsonSchema,
   },
 });
+
+export const auth = initializeAuth(app);
 
 export { database, model, imageToJsonModel };
