@@ -13,7 +13,9 @@ const Camera = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
 
   const handleTakePicture = async () => {
     if (cameraRef.current) {
-      const photo = await cameraRef.current.takePictureAsync();
+      const photo = await cameraRef.current.takePictureAsync({
+        base64: true,
+      });
       setPhoto(photo);
     }
   };

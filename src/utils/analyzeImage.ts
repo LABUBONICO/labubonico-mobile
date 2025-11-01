@@ -38,10 +38,29 @@ const extractImageDataToJson = async (base64: string) => {
           ", "
         )}",
         "local": "nome do estabelecimento se identificado",
-        "price": "valor total se identificado",
-        "timestamp": "data se identificada",
-        "items": "[array de objetos com name e price] de itens comprados se identificados"
+        "price": "valor total em centavos (SEM vírgula ou ponto). Ex: 1000 para R$10.00, 2550 para R$25.50",
+        "timestamp": "APENAS se extractable=1 - formato ISO 8601: YYYY-MM-DDTHH:mm:ss (use fuso horário de Brasília UTC-3 se houver ambiguidade). Retorne SOMENTE o timestamp, sem qualquer texto adicional ou explicação.",
+        "items": "[array de objetos com name, quantity e price] de itens comprados se identificados. Exemplo: [{name: 'Café', quantity: 2, price: 500}, {name: 'Pão', quantity: 1, price: 300}]"
       }
+
+      IMPORTANTE SOBRE PREÇOS:
+      - Retorne SEMPRE em centavos como número inteiro (ex: 1000 = R$10.00)
+      - NUNCA use vírgula ou ponto
+      - Para R$25.50, retorne: 2550
+      - Para R$100.99, retorne: 10099
+      - Aplique isso para "price" e para todos os "items[].price"
+
+      IMPORTANTE SOBRE ITENS:
+      - Cada item deve ter: name (string), quantity (número inteiro), price (em centavos, sem separadores)
+      - quantity deve ser um número inteiro positivo (ex: 1, 2, 3, etc.)
+      - Se não conseguir extrair a quantidade, use 1 como padrão
+      - price aqui é o preço total dos itens (não o preço unitário)
+
+      IMPORTANTE SOBRE TIMESTAMP:
+      - Retorne EXATAMENTE o timestamp em formato ISO 8601 (ex: 2018-03-28T16:31:00)
+      - NUNCA inclua explicações, texto adicional ou informações sobre fuso horário
+      - O campo "timestamp" deve conter APENAS um valor de data/hora, nada mais
+      - Se não conseguir extrair data/hora, deixe como string vazia ""
 
       NÃO retorne category ou dados se extractable = 0.
       Seja RÍGIDO: quando em dúvida, rejeite (extractable = 0).`,

@@ -1,7 +1,8 @@
 import {
-  ActivityIndicator,
-  Image,
+  FlatList,
+  Platform,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -11,23 +12,29 @@ import { MainStackParamList } from "../types/navigation";
 import { useEffect, useState } from "react";
 import { extractImageDataToJson } from "../utils/analyzeImage";
 import { JSONResponse } from "../types";
-import * as firestore from "firebase/firestore";
-import { recipties } from "../api/firestore";
+
+import ActionButtons from "../components/Details/ActionButtons";
+import LoadingError from "../components/Details/LoadingError";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import DetailsTextInput from "../components/Details/DetailsTextInput";
 
 const Details = ({
   route,
   navigation,
 }: NativeStackScreenProps<MainStackParamList, "Details">) => {
   const { photo } = route.params;
-  const [isLoading, setIsLoading] = useState(false);
   const [response, setResponse] = useState<JSONResponse | undefined>(undefined);
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   useEffect(() => {
     const loadDetails = async () => {
       try {
         console.log("Extracting data from photo...");
         const response = await extractImageDataToJson(photo?.base64 || "");
-        setResponse(response);
+        setResponse({
+          ...response,
+          timestamp: new Date(String(response.timestamp)),
+        });
       } catch (error) {
         console.error("Error extracting image data:", error);
       }
@@ -35,86 +42,102 @@ const Details = ({
     loadDetails();
   }, [photo]);
 
-  const saveDetails = async () => {
-    try {
-      setIsLoading(true);
-      await firestore.addDoc(recipties, response);
-      navigation.popToTop();
-    } catch (error) {
-      console.error("Error saving document:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  if (!photo) {
-    return (
-      <View style={styles.container}>
-        <Text>No photo available</Text>
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
       {!response || response?.extractable == 0 ? (
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
-          <Image
-            source={require("../../assets/images/labubonico_logo.png")}
-            style={{ width: 40, height: 40 }}
-          />
-          <Text>
-            {response ? response.errorMessage : "labubonico está pensando..."}
-          </Text>
-        </View>
+        <LoadingError response={response} />
       ) : (
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
-          <Image
-            source={{ uri: photo.uri }}
-            style={{ width: "100%", height: "50%" }}
-            resizeMode="contain"
+          <Text>{response.category}</Text>
+          <TextInput
+            value={response.local}
+            onChangeText={(text) => setResponse({ ...response, local: text })}
           />
-          <Text>{JSON.stringify(response, null, 2)}</Text>
+          <TouchableOpacity
+            onPress={() => setShowDatePicker(true)}
+            style={{
+              padding: 10,
+              backgroundColor: "#e0e0e0",
+              borderRadius: 5,
+              marginVertical: 10,
+            }}
+          >
+            <Text>
+              {response.timestamp?.toLocaleDateString() || "Selecionar data"}
+            </Text>
+          </TouchableOpacity>
+          {showDatePicker && (
+            <DateTimePicker
+              value={response.timestamp || new Date()}
+              mode="date"
+              display={Platform.OS === "ios" ? "spinner" : "default"}
+              onChange={(event, date?: Date) => {
+                if (Platform.OS === "android") {
+                  setShowDatePicker(false);
+                }
+                if (date) {
+                  setResponse({ ...response, timestamp: date });
+                }
+              }}
+            />
+          )}
+          <View style={{ flexDirection: "row" }}>
+            <Text>Total R$ </Text>
+            <TextInput
+              value={String(response.price)}
+              keyboardType="numeric"
+              onChangeText={(number) => {
+                setResponse({ ...response, price: Number(number) });
+              }}
+            />
+          </View>
+          <FlatList
+            data={response.items}
+            style={{ flexGrow: 0 }}
+            renderItem={({ item, index }) => (
+              <View key={index} style={{ flexDirection: "row" }}>
+                <DetailsTextInput
+                  item={item.name}
+                  index={index}
+                  response={response}
+                  setResponse={setResponse}
+                />
+                <DetailsTextInput
+                  item={item.quantity}
+                  index={index}
+                  response={response}
+                  setResponse={setResponse}
+                  numeric
+                />
+                <View style={{ flexDirection: "row" }}>
+                  <Text>R$ </Text>
+                  <DetailsTextInput
+                    item={item.price}
+                    index={index}
+                    response={response}
+                    setResponse={setResponse}
+                    numeric
+                  />
+                </View>
+              </View>
+            )}
+          />
+          <TouchableOpacity
+            onPress={() => {
+              const newItems = [
+                ...(response.items || []),
+                { name: "", quantity: 1, price: 0 },
+              ];
+              setResponse({ ...response, items: newItems });
+            }}
+          >
+            <Text>+ Adicionar Item</Text>
+          </TouchableOpacity>
         </View>
       )}
-      <View
-        style={{
-          position: "absolute",
-          bottom: 50,
-          left: 20,
-          right: 20,
-          flexDirection: "row",
-          justifyContent: "space-between",
-        }}
-      >
-        <TouchableOpacity
-          style={styles.buttonIcon}
-          onPress={() => navigation.popToTop()}
-        >
-          <Text>Descartar</Text>
-        </TouchableOpacity>
-        {response &&
-          (response?.extractable == 0 ? (
-            <TouchableOpacity
-              style={styles.buttonIcon}
-              onPress={() => navigation.goBack()}
-            >
-              <Text>Tentar Novamente</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity style={styles.buttonIcon} onPress={saveDetails}>
-              {isLoading ? (
-                <ActivityIndicator color="white" size={"small"} />
-              ) : (
-                <Text>Ok</Text>
-              )}
-            </TouchableOpacity>
-          ))}
-      </View>
+      <ActionButtons response={response} navigation={navigation} />
     </View>
   );
 };
