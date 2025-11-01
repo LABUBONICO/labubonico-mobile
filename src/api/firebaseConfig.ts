@@ -4,7 +4,12 @@ import { getFirestore } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { initializeAuth } from "firebase/auth";
 import { getReactNativePersistence } from "firebase/auth";
-import { getAI, getGenerativeModel, GoogleAIBackend, Schema } from "firebase/ai";
+import {
+  getAI,
+  getGenerativeModel,
+  GoogleAIBackend,
+  Schema,
+} from "firebase/ai";
 
 const imageToJsonSchema = Schema.object({
   properties: {
@@ -18,6 +23,7 @@ const imageToJsonSchema = Schema.object({
       items: Schema.object({
         properties: {
           name: Schema.string(),
+          quantity: Schema.number(),
           price: Schema.number(),
         },
       }),
