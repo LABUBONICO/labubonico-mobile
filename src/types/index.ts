@@ -10,23 +10,13 @@ type Message = {
 };
 
 type JSONResponse = {
-  extractable: number;
-  errorMessage?: string;
-  category?: string;
-  local?: string;
-  price?: string;
-  timestamp?: string;
+  category: string;
+  local: string;
+  price: number;
+  timestamp: string;
   items?: Array<{ name: string; price: string }>;
+  accuracy: number;
+  errorMessage?: string;
 };
 
-type Receipt = {
-  local: string,
-  price: number,
-  category: string,
-  timestamp: string,
-  items?: { name: string }[],
-  accuracy: number,
-  errorMessage?: string,
-}
-
-export { Message, JSONResponse, Receipt };
+export { Message, JSONResponse };
