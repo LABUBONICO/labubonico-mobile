@@ -27,30 +27,28 @@ const CategorieSheet = () => {
   const [name, setName] = useState(
     payload ? categories[payload?.index || 0].name : ""
   );
+  const [emptyNameError, setEmptyNameError] = useState(false);
 
   const handleSave = async () => {
-    try {
-      if (!payload) {
-        await updateCategories([...categories, { color, name }]);
-      } else {
-        const updatedCategories = [...categories];
-        updatedCategories[payload.index] = { color, name };
-        await updateCategories(updatedCategories);
-      }
-    } catch (error) {
-    } finally {
+    if (!name.trim()) {
+      setEmptyNameError(true);
+      return;
+    } else if (!payload) {
+      await updateCategories([...categories, { color, name }]);
+      ref.current.hide();
+    } else {
+      const updatedCategories = [...categories];
+      updatedCategories[payload.index] = { color, name };
+      await updateCategories(updatedCategories);
       ref.current.hide();
     }
   };
 
   const handleDelete = () => {
-    try {
-      if (payload) {
-        const updatedCategories = [...categories];
-        updatedCategories.splice(payload.index, 1);
-        updateCategories(updatedCategories);
-      }
-    } finally {
+    if (payload) {
+      const updatedCategories = [...categories];
+      updatedCategories.splice(payload.index, 1);
+      updateCategories(updatedCategories);
       ref.current.hide();
     }
   };
@@ -86,7 +84,10 @@ const CategorieSheet = () => {
           )}
         />
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            { borderColor: emptyNameError ? "red" : "#ccc" },
+          ]}
           placeholder="Nome da categoria"
           value={name}
           onChangeText={setName}
