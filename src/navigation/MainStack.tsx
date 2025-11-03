@@ -6,6 +6,7 @@ import Camera from "../screens/Camera";
 import Details from "../screens/Details";
 import Profile from "../screens/Profile";
 import { MainStackParamList } from "../types/navigation";
+import Categories from "../screens/Categories";
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
 
@@ -18,6 +19,7 @@ const MainStack = () => {
         <Stack.Screen name="Camera" component={Camera} />
         <Stack.Screen name="Details" component={Details} />
         <Stack.Screen name="Profile" component={Profile} />
+        <Stack.Screen name="Categories" component={Categories} />
       </Stack.Navigator>
     </NavigationContainer>
   );

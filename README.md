@@ -26,10 +26,17 @@ Labubonico é uma solução moderna para gestão de finanças pessoais que elimi
   - Relatórios sob demanda em linguagem natural
 
 - **📊 Balanço Mensal Automático**
+
   - Consolidação automática de todas as despesas
   - Visualização clara de entradas e saídas
   - Categorização inteligente de gastos
   - Histórico completo de transações
+
+- **⚙️ Gerenciamento Customizável de Categorias**
+  - Crie, edite e delete categorias personalizadas
+  - Atribua cores exclusivas para cada categoria
+  - Sincronização automática com Firebase Firestore
+  - Categorias padrão pré-configuradas para facilitar o uso
 
 ## 🛠️ Tecnologias Utilizadas
 
@@ -37,7 +44,8 @@ Labubonico é uma solução moderna para gestão de finanças pessoais que elimi
 
 - **Expo** - Framework para desenvolvimento React Native
 - **TypeScript** - Tipagem estática e melhor experiência de desenvolvimento
-- **expo-camera** - Captura de fotos e acesso à câmera do dispositivo
+- **React Native Gesture Handler** - Manipulação de gestos táteis
+- **React Native Actions Sheet** - Interface de action sheets personalizadas
 
 ### Backend & Serviços
 
@@ -153,12 +161,14 @@ labubonico/
 ├── src/
 │   ├── api/             # Inicialização (Firebase, IA)
 │   ├── components/      # Componentes reutilizáveis
-│   ├── contexts/        # Contexts da aplicação
+│   │   └── sheets/      # Action sheets personalizadas
+│   ├── contexts/        # Contexts da aplicação (Auth, Categories)
 │   ├── navigation/      # Config de navegação do App (Stack, Bottom Tabs, Top Tabs)
 │   ├── screens/         # Telas do aplicativo
-│   ├── services/        # Serviços (Firebase, IA)
+│   ├── sheets/          # Registro e configuração de action sheets
 │   ├── types/           # Definições TypeScript
-│   └── utils/           # Funções utilitárias
+│   ├── utils/           # Funções utilitárias
+│   └── styles/          # Estilos compartilhados
 ├── assets/              # Imagens e recursos
 ├── app.json            # Configuração do Expo
 └── package.json        # Dependências do projeto

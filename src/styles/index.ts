@@ -1,5 +1,18 @@
 import { StyleSheet } from "react-native";
 
+export const CATEGORY_COLORS = [
+  "#1FC56F",
+  "#1ABC9C",
+  "#3498DB",
+  "#FFD93D",
+  "#FF9A00",
+  "#E74C3C",
+  "#FC5D8B",
+  "#C75FFE",
+  "#DBA39A",
+  "#2C3E50",
+];
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -79,6 +92,19 @@ const styles = StyleSheet.create({
   },
   icon: {
     padding: 25,
+  },
+  button: {
+    padding: 15,
+    borderRadius: 10,
+    backgroundColor: "#DDD",
+    width: "60%",
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  buttonText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    flex: 1,
   },
 });
 
