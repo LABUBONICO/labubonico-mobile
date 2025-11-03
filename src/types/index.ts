@@ -19,4 +19,14 @@ type JSONResponse = {
   items?: Array<{ name: string; price: string }>;
 };
 
-export { Message, JSONResponse };
+type Receipt = {
+  local: string,
+  price: number,
+  category: string,
+  timestamp: string,
+  items?: { name: string }[],
+  accuracy: number,
+  errorMessage?: string,
+}
+
+export { Message, JSONResponse, Receipt };

@@ -1,21 +1,11 @@
 import styles from "../styles";
 import * as firestore from "firebase/firestore";
+import { Receipt } from "../types";
 import { receipties } from "../api/firestore";
 import { MainStackParamList } from "../types/navigation";
 import { useEffect, useState } from "react";
-import { Text, View, FlatList, ActivityIndicator } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-
-type Receipt = {
-  id?: string,
-  local?: string,
-  price: number,
-  category: string,
-  timestamp?: string,
-  items?: { name: string }[],
-  extractable?: string,
-  errorMessage?: string,
-}
+import { Text, View, FlatList, ActivityIndicator } from "react-native";
 
 const Home = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
 
@@ -67,7 +57,7 @@ const Home = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
             {
               receiptsList.length === 0 ?
                 <View style={styles.container}>
-                  <Text>Não</Text>
+                  <Text>Você não possui despesas cadastradas</Text>
                 </View> :
                 <FlatList
                   data={receiptsList}
