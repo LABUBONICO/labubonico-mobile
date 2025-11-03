@@ -14,7 +14,6 @@ import {
   View,
 } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
-import { extractImageDataToJson } from "../utils/analyzeImage";
 import * as FileSystem from "expo-file-system/legacy";
 
 const Chat = () => {
@@ -98,7 +97,6 @@ const Chat = () => {
       }
 
       const response = await chatRef.current.sendMessage(messageParts);
-      await extractImageDataToJson(messageParts[1].inlineData.data);
 
       setMessages((prev) => [
         ...prev,
