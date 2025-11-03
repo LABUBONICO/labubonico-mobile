@@ -4,4 +4,5 @@ export type MainStackParamList = {
   Camera: undefined;
   Details: undefined;
   Profile: undefined;
+  Categories: undefined;
 };
