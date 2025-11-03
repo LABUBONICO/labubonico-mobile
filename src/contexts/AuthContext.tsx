@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, PropsWithChildren, useEffect, useState } from "react";
 import * as firebase from "firebase/auth";
 import { FirebaseError } from "firebase/app";
 import { auth } from "../api/firebaseConfig";
@@ -26,7 +26,7 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
-const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+const AuthProvider = ({ children }: PropsWithChildren) => {
   const [user, setUser] = useState<firebase.User | null>(null);
   const [errorMSG, setErrorMSG] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -84,8 +84,13 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const register = async (name: string, email: string, password: string) => {
     try {
       setLoading(true);
-      await firebase.createUserWithEmailAndPassword(auth, email, password);
-      user ? await firebase.updateProfile(user, { displayName: name }) : null;
+      const { user } = await firebase.createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      await firebase.updateProfile(user, { displayName: name });
+      setUser(user);
     } catch (error) {
       console.error("Signup error: ", error);
       setErrorMSG(getErrorMessage(error));

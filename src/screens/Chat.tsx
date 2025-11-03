@@ -14,9 +14,12 @@ import {
   View,
 } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { MainStackParamList } from "../types/navigation";
+import { useCameraPermissions } from "expo-camera";
 import * as FileSystem from "expo-file-system/legacy";
 
-const Chat = () => {
+const Chat = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
   const [input, setInput] = useState<string>("");
   const [isChat, setIsChat] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -24,6 +27,18 @@ const Chat = () => {
   const [file, setFile] = useState<DocumentPicker.DocumentPickerResult | null>(
     null
   );
+  const [permission, requestPermission] = useCameraPermissions();
+
+  const handleOpenCamera = async () => {
+    if (permission?.granted) {
+      navigation.navigate("Camera");
+    } else {
+      const granted = await requestPermission();
+      if (granted) {
+        navigation.navigate("Camera");
+      }
+    }
+  };
 
   const chatRef = useRef(
     model.startChat({
@@ -173,7 +188,7 @@ const Chat = () => {
 
         {/* change to navigate to camera screen */}
         <TouchableOpacity
-          onPress={input ? handlerSend : handlerSend}
+          onPress={input ? handlerSend : handleOpenCamera}
           style={styles.buttonIcon}
         >
           <Ionicons name={input ? "send" : "camera"} size={30} color="#000" />

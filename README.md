@@ -10,10 +10,12 @@ Labubonico é uma solução moderna para gestão de finanças pessoais que elimi
 
 - **📸 Captura Inteligente de Documentos**
 
-  - Tire fotos de comprovantes e recibos físicos
+  - Tire fotos de comprovantes e recibos físicos com câmera integrada
   - Envie documentos digitais gerados por apps bancários
   - Reconhecimento automático de valores, datas e categorias
   - Processamento instantâneo com IA para extração de dados
+  - Controle de flash e preview da foto antes de enviar
+  - Validação de qualidade da imagem para melhor precisão
 
 - **🤖 Chatbot Financeiro Inteligente**
 
@@ -24,10 +26,17 @@ Labubonico é uma solução moderna para gestão de finanças pessoais que elimi
   - Relatórios sob demanda em linguagem natural
 
 - **📊 Balanço Mensal Automático**
+
   - Consolidação automática de todas as despesas
   - Visualização clara de entradas e saídas
   - Categorização inteligente de gastos
   - Histórico completo de transações
+
+- **⚙️ Gerenciamento Customizável de Categorias**
+  - Crie, edite e delete categorias personalizadas
+  - Atribua cores exclusivas para cada categoria
+  - Sincronização automática com Firebase Firestore
+  - Categorias padrão pré-configuradas para facilitar o uso
 
 ## 🛠️ Tecnologias Utilizadas
 
@@ -35,6 +44,8 @@ Labubonico é uma solução moderna para gestão de finanças pessoais que elimi
 
 - **Expo** - Framework para desenvolvimento React Native
 - **TypeScript** - Tipagem estática e melhor experiência de desenvolvimento
+- **React Native Gesture Handler** - Manipulação de gestos táteis
+- **React Native Actions Sheet** - Interface de action sheets personalizadas
 
 ### Backend & Serviços
 
@@ -92,6 +103,20 @@ npx start
 
 ## ⚙️ Configurações Importantes
 
+### Camera Setup
+
+Para usar a funcionalidade de câmera, o seguinte está configurado:
+
+1. **Permissões Automáticas**
+
+   - A permissão de câmera é solicitada automaticamente quando o usuário acessa a tela de câmera
+   - A permissão de microfone também é solicitada (requerida pelo Android para captura com audio)
+
+2. **Características**
+   - Flash ligável/desligável durante a captura
+   - Preview da foto antes de enviar para análise
+   - Opções para descartar ou confirmar a foto
+
 ### Google Sign-In Setup
 
 Para usar o **Google Sign-In** com sucesso, você precisará:
@@ -136,12 +161,14 @@ labubonico/
 ├── src/
 │   ├── api/             # Inicialização (Firebase, IA)
 │   ├── components/      # Componentes reutilizáveis
-│   ├── contexts/        # Contexts da aplicação
+│   │   └── sheets/      # Action sheets personalizadas
+│   ├── contexts/        # Contexts da aplicação (Auth, Categories)
 │   ├── navigation/      # Config de navegação do App (Stack, Bottom Tabs, Top Tabs)
 │   ├── screens/         # Telas do aplicativo
-│   ├── services/        # Serviços (Firebase, IA)
+│   ├── sheets/          # Registro e configuração de action sheets
 │   ├── types/           # Definições TypeScript
-│   └── utils/           # Funções utilitárias
+│   ├── utils/           # Funções utilitárias
+│   └── styles/          # Estilos compartilhados
 ├── assets/              # Imagens e recursos
 ├── app.json            # Configuração do Expo
 └── package.json        # Dependências do projeto

@@ -2,12 +2,17 @@
 import { getFirestore } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { initializeAuth } from "firebase/auth";
-import { getAI, getGenerativeModel, GoogleAIBackend, Schema } from "firebase/ai";
+import {
+  getAI,
+  getGenerativeModel,
+  GoogleAIBackend,
+  Schema,
+} from "firebase/ai";
 
 const imageToJsonSchema = Schema.object({
   properties: {
     price: Schema.number({
-      description: "Para valores não definidos atribua 0.00"
+      description: "Para valores não definidos atribua 0.00",
     }),
     local: Schema.string(),
     category: Schema.string(),
@@ -17,17 +22,19 @@ const imageToJsonSchema = Schema.object({
         nullable: true,
         properties: {
           name: Schema.string(),
+          quantity: Schema.number(),
           price: Schema.number(),
         },
       }),
     }),
     accuracy: Schema.number({
-      description: "Valor de 0 a 1 que representa a precisão da extração dos dados."
+      description:
+        "Valor de 0 a 1 que representa a precisão da extração dos dados.",
     }),
     errorMessage: Schema.string({
       nullable: true,
       description: "Em caso de accuracy baixa crie uma mensagem de erro",
-    })
+    }),
   },
   optionalProperties: ["items", "errorMessage"],
 });

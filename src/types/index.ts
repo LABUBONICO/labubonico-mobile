@@ -13,8 +13,8 @@ type JSONResponse = {
   category: string;
   local: string;
   price: number;
-  timestamp: string;
-  items?: Array<{ name: string; price: string }>;
+  timestamp: Date;
+  items?: Array<{ name: string; quantity: number; price: number }>;
   accuracy: number;
   errorMessage?: string;
 };
