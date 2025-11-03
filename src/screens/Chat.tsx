@@ -17,6 +17,7 @@ import * as DocumentPicker from "expo-document-picker";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { MainStackParamList } from "../types/navigation";
 import { useCameraPermissions } from "expo-camera";
+import * as FileSystem from "expo-file-system/legacy";
 
 const Chat = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
   const [input, setInput] = useState<string>("");
@@ -49,7 +50,26 @@ const Chat = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
     const imagePicked = await DocumentPicker.getDocumentAsync({
       type: ["image/*", "application/pdf"],
       copyToCacheDirectory: true,
+      base64: true,
     });
+
+    // If base64 is not available (mobile), convert file to base64
+    if (
+      imagePicked.assets &&
+      imagePicked.assets[0] &&
+      !imagePicked.assets[0].base64
+    ) {
+      try {
+        const base64Data = await FileSystem.readAsStringAsync(
+          imagePicked.assets[0].uri,
+          { encoding: "base64" }
+        );
+        imagePicked.assets[0].base64 = base64Data;
+      } catch (error) {
+        console.error("Error converting file to base64:", error);
+      }
+    }
+
     setFile(imagePicked);
   };
 

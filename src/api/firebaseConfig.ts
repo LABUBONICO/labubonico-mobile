@@ -1,9 +1,7 @@
 // Import the functions you need from the SDKs you need
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getFirestore } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { initializeAuth } from "firebase/auth";
-import { getReactNativePersistence } from "firebase/auth";
 import {
   getAI,
   getGenerativeModel,
@@ -13,14 +11,15 @@ import {
 
 const imageToJsonSchema = Schema.object({
   properties: {
-    extractable: Schema.number(),
-    errorMessage: Schema.string(),
-    price: Schema.number(),
+    price: Schema.number({
+      description: "Para valores não definidos atribua 0.00",
+    }),
     local: Schema.string(),
     category: Schema.string(),
     timestamp: Schema.string(),
     items: Schema.array({
       items: Schema.object({
+        nullable: true,
         properties: {
           name: Schema.string(),
           quantity: Schema.number(),
@@ -28,15 +27,16 @@ const imageToJsonSchema = Schema.object({
         },
       }),
     }),
+    accuracy: Schema.number({
+      description:
+        "Valor de 0 a 1 que representa a precisão da extração dos dados.",
+    }),
+    errorMessage: Schema.string({
+      nullable: true,
+      description: "Em caso de accuracy baixa crie uma mensagem de erro",
+    }),
   },
-  optionalProperties: [
-    "errorMessage",
-    "price",
-    "local",
-    "category",
-    "timestamp",
-    "items",
-  ],
+  optionalProperties: ["items", "errorMessage"],
 });
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -55,13 +55,15 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
+// Initialize Authentication
+const auth = initializeAuth(app);
+
 // Initialize Firestore
 const database = getFirestore(app);
 
 // Initialize the Gemini Developer API backend service
 const ai = getAI(app, { backend: new GoogleAIBackend() });
 
-// Create a `GenerativeModel` instance with a model that supports your use case
 const model = getGenerativeModel(ai, {
   model: "gemini-2.5-flash",
   systemInstruction: `
@@ -79,6 +81,4 @@ const imageToJsonModel = getGenerativeModel(ai, {
   },
 });
 
-export const auth = initializeAuth(app);
-
-export { database, model, imageToJsonModel };
+export { auth, database, model, imageToJsonModel };

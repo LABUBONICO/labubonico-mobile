@@ -1,17 +1,13 @@
-import { imageToJsonModel } from "../api/firebaseConfig";
 import { JSONResponse } from "../types";
+import { imageToJsonModel } from "../api/firebaseConfig";
 
 const extractImageDataToJson = async (base64: string) => {
   console.log("Analyzing image and extracting JSON data...");
   const categories = ["ALIMENTAÇÃO", "TRANSPORTE", "LAZER", "OUTROS"];
 
-  // Strip the data URI prefix if present (e.g., "data:image/png;base64,")
-  const cleanBase64 = base64.includes(",") ? base64.split(",")[1] : base64;
-
   const result = await imageToJsonModel.generateContent([
     {
       text: `Você é um validador rigoroso de comprovantes. Analise a qualidade da imagem e extraia informações APENAS se a qualidade for aceitável.
-
       ANÁLISE DE QUALIDADE (PRIORIDADE MÁXIMA):
       1. Verifique se o texto é legível (não está borrado, pixelado ou distorcido)
       2. Verifique se a imagem não está muito escura, muito clara ou com contraste ruim
@@ -25,7 +21,6 @@ const extractImageDataToJson = async (base64: string) => {
       - Imagem muito escura ou muito clara (backlight)
       - Valores ou datas não conseguem ser lidos claramente
       - Qualidade geral inadequada para OCR
-
       RESPOSTA OBRIGATÓRIA:
       - Se a imagem NÃO atender aos critérios de qualidade: extractable = 0 e inclua errorMessage detalhado
       - Se a imagem atender aos critérios: extractable = 1 e extraia os dados
@@ -68,15 +63,14 @@ const extractImageDataToJson = async (base64: string) => {
     {
       inlineData: {
         mimeType: "image/jpeg",
-        data: cleanBase64,
+        data: base64,
       },
     },
   ]);
 
-  console.log("Image analysis complete.");
-  const doc: JSONResponse = JSON.parse(result.response.text());
-  console.log("Extracted JSON:", doc);
-  return doc;
+  const json: JSONResponse = JSON.parse(result.response.text());
+
+  return json;
 };
 
 export { extractImageDataToJson };

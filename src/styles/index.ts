@@ -16,6 +16,7 @@ export const CATEGORY_COLORS = [
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: "100%",
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#f1f1f1",
