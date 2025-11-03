@@ -44,7 +44,7 @@ const Details = ({
 
   return (
     <View style={styles.container}>
-      {!response || response?.extractable == 0 ? (
+      {!response || response?.errorMessage ? (
         <LoadingError response={response} />
       ) : (
         <View

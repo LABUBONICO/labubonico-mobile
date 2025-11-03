@@ -93,10 +93,6 @@ const Home = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
 
       <View style={styles.containerRow}>
         <Text onPress={() => navigation.navigate("Chat")}>Go to Chat</Text>
-        <Text onPress={() => navigation.navigate("Camera")}>Go to Camera</Text>
-        <Text onPress={() => navigation.navigate("Details")}>
-          Go to Details
-        </Text>
         <Text onPress={() => navigation.navigate("Profile")}>
           Go to Profile
         </Text>
