@@ -1,11 +1,5 @@
 import React, { useState, useMemo } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  ScrollView,
-  TouchableOpacity,
-} from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { JSONResponse } from "../../types";
 import { Category } from "../../contexts/CategoriesContext";
 
@@ -22,202 +16,172 @@ interface ChartDataItem {
 
 type ViewMode = "days" | "weeks" | "months";
 
+const MONTH_NAMES = [
+  "Jan",
+  "Fev",
+  "Mar",
+  "Abr",
+  "Mai",
+  "Jun",
+  "Jul",
+  "Ago",
+  "Set",
+  "Out",
+  "Nov",
+  "Dez",
+];
+const DAY_NAMES = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"];
+
+const parseDate = (ts: any): Date | null => {
+  try {
+    if (ts instanceof Date) return ts;
+    if (typeof ts === "number") return new Date(ts);
+    if (ts?.toDate) return ts.toDate();
+    if (ts?.seconds) return new Date(ts.seconds * 1000);
+    return new Date(ts);
+  } catch {
+    return null;
+  }
+};
+
+const getDateKey = (date: Date): string => {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(
+    date.getDate()
+  )}`;
+};
+
+const getWeekOfMonth = (date: Date): number => {
+  const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+  const week = Math.ceil((date.getDate() + firstDay.getDay()) / 7);
+  return Math.min(week, 4);
+};
+
+const getWeekKey = (date: Date): string =>
+  `${date.getFullYear()}-${date.getMonth()}-W${getWeekOfMonth(date)}`;
+
 const StackedBarChartScreen: React.FC<StackedBarChartProps> = ({
   receipts = [],
   categories = [],
 }) => {
-  const [selectedEntry, setSelectedEntry] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("weeks");
-
-  const getDayOfWeek = (date: Date) =>
-    ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"][date.getDay()];
-
-  const getWeekOfMonth = (date: Date): number => {
-    const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
-    const firstDayOfWeek = firstDay.getDay();
-    const dayOfMonth = date.getDate();
-    return Math.ceil((dayOfMonth + firstDayOfWeek) / 7);
-  };
-
-  const getMonthName = (date: Date): string => {
-    const months = [
-      "Jan",
-      "Fev",
-      "Mar",
-      "Abr",
-      "Mai",
-      "Jun",
-      "Jul",
-      "Ago",
-      "Set",
-      "Out",
-      "Nov",
-      "Dez",
-    ];
-    return months[date.getMonth()];
-  };
 
   const getCurrentWeekDates = (): Date[] => {
     const today = new Date();
-    const currentDay = today.getDay();
-    const dates = [];
-    for (let i = 0; i < 7; i++) {
+    return Array.from({ length: 7 }, (_, i) => {
       const date = new Date(today);
-      date.setDate(date.getDate() - currentDay + i);
-      dates.push(date);
-    }
-    return dates;
+      date.setDate(date.getDate() - today.getDay() + i);
+      return date;
+    });
   };
 
-  const getCurrentMonthDates = (): Date[] => {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = today.getMonth();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const dates = [];
-    for (let i = 1; i <= daysInMonth; i++) {
-      dates.push(new Date(year, month, i));
-    }
-    return dates;
+  const findCategory = (name: string) =>
+    categories.find((cat) => cat.name.toUpperCase() === name.toUpperCase());
+
+  const buildChartData = (
+    keys: string[],
+    processor: (data: any, receipt: JSONResponse) => string | null
+  ) => {
+    const data: any = {};
+    keys.forEach((key) => {
+      data[key] = {};
+      categories.forEach((cat) => (data[key][cat.name] = 0));
+    });
+
+    receipts.forEach((receipt) => {
+      const receiptDate = parseDate(receipt.timestamp);
+      if (!receiptDate || isNaN(receiptDate.getTime()) || !receipt.category)
+        return;
+
+      const key = processor(data, receipt);
+      if (!key || !data[key]) return;
+
+      const category = findCategory(receipt.category.trim());
+      if (category) data[key][category.name] += receipt.price;
+    });
+
+    return data;
   };
 
-  const parseDate = (ts: any): Date | null => {
-    try {
-      if (ts instanceof Date) return ts;
-      if (typeof ts === "number") return new Date(ts);
-      if (ts?.toDate) return ts.toDate();
-      if (ts?.seconds) return new Date(ts.seconds * 1000);
-      return new Date(ts);
-    } catch {
-      return null;
-    }
-  };
+  const getTotalFromData = (item: any): number =>
+    Object.values(item)
+      .filter((v) => typeof v === "number")
+      .reduce((a: any, b: any) => a + b, 0);
 
-  // Process receipts data grouped by selected view mode and category
   const data: ChartDataItem[] = useMemo(() => {
     if (viewMode === "days") {
       const weekDates = getCurrentWeekDates();
-      const daysData: any = {};
-
-      weekDates.forEach((date) => {
-        const dayLabel = getDayOfWeek(date);
-        daysData[dayLabel] = {};
-        categories.forEach((cat) => (daysData[dayLabel][cat.name] = 0));
-      });
-
-      receipts.forEach((receipt) => {
-        const receiptDate = parseDate(receipt.timestamp);
-        if (!receiptDate || isNaN(receiptDate.getTime()) || !receipt.category)
-          return;
-
-        const dayLabel = getDayOfWeek(receiptDate);
-        const receiptCategory = receipt.category.trim();
-
-        const matchedCategory = categories.find(
-          (cat) => cat.name.toUpperCase() === receiptCategory.toUpperCase()
-        );
-
-        if (matchedCategory && daysData[dayLabel]) {
-          daysData[dayLabel][matchedCategory.name] += receipt.price;
+      const daysData = buildChartData(
+        weekDates.map(getDateKey),
+        (data, receipt) => {
+          const receiptDate = parseDate(receipt.timestamp);
+          if (!receiptDate) return null;
+          const key = getDateKey(receiptDate);
+          return weekDates.some((d) => getDateKey(d) === key) ? key : null;
         }
-      });
+      );
 
-      return getCurrentWeekDates().map((date) => {
-        const dayLabel = getDayOfWeek(date);
+      return weekDates.map((date) => {
+        const key = getDateKey(date);
         return {
-          label: dayLabel,
-          total: Object.values(daysData[dayLabel] || {}).reduce(
-            (a: any, b: any) => a + b,
-            0
-          ),
-          ...daysData[dayLabel],
+          label: DAY_NAMES[date.getDay()],
+          total: getTotalFromData(daysData[key] || {}),
+          ...(daysData[key] || {}),
         };
       });
-    } else if (viewMode === "weeks") {
-      const weeks = [1, 2, 3, 4];
-      const weeksData: any = {};
-
-      weeks.forEach((week) => {
-        weeksData[week] = {};
-        categories.forEach((cat) => (weeksData[week][cat.name] = 0));
-      });
-
-      receipts.forEach((receipt) => {
-        const receiptDate = parseDate(receipt.timestamp);
-        if (!receiptDate || isNaN(receiptDate.getTime()) || !receipt.category)
-          return;
-
-        const weekNumber = getWeekOfMonth(receiptDate);
-        const receiptCategory = receipt.category.trim();
-
-        const matchedCategory = categories.find(
-          (cat) => cat.name.toUpperCase() === receiptCategory.toUpperCase()
-        );
-
-        if (matchedCategory && weeksData[weekNumber]) {
-          weeksData[weekNumber][matchedCategory.name] += receipt.price;
-        }
-      });
-
-      return weeks.map((week) => ({
-        label: `Semana ${week}`,
-        total: Object.values(weeksData[week]).reduce(
-          (a: any, b: any) => a + b,
-          0
-        ),
-        ...weeksData[week],
-      }));
-    } else {
-      // months view
-      const months = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-      const monthsData: any = {};
-
-      months.forEach((month) => {
-        monthsData[month] = {};
-        categories.forEach((cat) => (monthsData[month][cat.name] = 0));
-      });
-
-      receipts.forEach((receipt) => {
-        const receiptDate = parseDate(receipt.timestamp);
-        if (!receiptDate || isNaN(receiptDate.getTime()) || !receipt.category)
-          return;
-
-        const monthIndex = receiptDate.getMonth();
-        const receiptCategory = receipt.category.trim();
-
-        const matchedCategory = categories.find(
-          (cat) => cat.name.toUpperCase() === receiptCategory.toUpperCase()
-        );
-
-        if (matchedCategory && monthsData[monthIndex] !== undefined) {
-          monthsData[monthIndex][matchedCategory.name] += receipt.price;
-        }
-      });
-
-      const monthNames = [
-        "Jan",
-        "Fev",
-        "Mar",
-        "Abr",
-        "Mai",
-        "Jun",
-        "Jul",
-        "Ago",
-        "Set",
-        "Out",
-        "Nov",
-        "Dez",
-      ];
-
-      return months.map((month) => ({
-        label: monthNames[month],
-        total: Object.values(monthsData[month]).reduce(
-          (a: any, b: any) => a + b,
-          0
-        ),
-        ...monthsData[month],
-      }));
     }
+
+    if (viewMode === "weeks") {
+      const today = new Date();
+      const weeks = [1, 2, 3, 4];
+      const weeksData = buildChartData(
+        weeks.map((w) => `${today.getFullYear()}-${today.getMonth()}-W${w}`),
+        (data, receipt) => {
+          const receiptDate = parseDate(receipt.timestamp);
+          if (!receiptDate) return null;
+          if (
+            receiptDate.getFullYear() !== today.getFullYear() ||
+            receiptDate.getMonth() !== today.getMonth()
+          )
+            return null;
+          return getWeekKey(receiptDate);
+        }
+      );
+
+      return weeks.map((week) => {
+        const key = `${today.getFullYear()}-${today.getMonth()}-W${week}`;
+        const weekData = weeksData[key] || {};
+        return {
+          label: `Semana ${week}`,
+          total: getTotalFromData(weekData),
+          ...Object.fromEntries(
+            Object.entries(weekData).filter(([k]) => k !== "weekNumber")
+          ),
+        };
+      });
+    }
+
+    // months view
+    const today = new Date();
+    const months = Array.from({ length: 12 }, (_, i) => i);
+    const monthsData = buildChartData(
+      months.map((m) => `${today.getFullYear()}-${m}`),
+      (data, receipt) => {
+        const receiptDate = parseDate(receipt.timestamp);
+        if (!receiptDate || receiptDate.getFullYear() !== today.getFullYear())
+          return null;
+        return `${today.getFullYear()}-${receiptDate.getMonth()}`;
+      }
+    );
+
+    return months.map((month) => {
+      const key = `${today.getFullYear()}-${month}`;
+      return {
+        label: MONTH_NAMES[month],
+        total: getTotalFromData(monthsData[key] || {}),
+        ...(monthsData[key] || {}),
+      };
+    });
   }, [receipts, categories, viewMode]);
 
   const max = Math.max(...data.map((d) => d.total as number), 1);
@@ -280,14 +244,7 @@ const StackedBarChartScreen: React.FC<StackedBarChartProps> = ({
                 R$ {(item.total as number).toFixed(2)}
               </Text>
             </View>
-            <View
-              style={styles.stackedBar}
-              onTouchEnd={() =>
-                setSelectedEntry(
-                  `${item.label}: R$ ${(item.total as number).toFixed(2)}`
-                )
-              }
-            >
+            <View style={styles.stackedBar}>
               {categories.map((cat) => {
                 const height = (((item[cat.name] || 0) as number) / max) * 100;
                 return height > 0 ? (
