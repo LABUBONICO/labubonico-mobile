@@ -8,6 +8,8 @@ const extractImageDataToJson = async (
 ) => {
   console.log("Analyzing image and extracting JSON data...");
 
+  const categoryNames = categories.map((cat) => cat.name).join(", ");
+
   const result = await imageToJsonModel.generateContent([
     {
       text: `Você é um validador rigoroso de comprovantes. Analise a qualidade da imagem e extraia informações APENAS se a qualidade for aceitável.
@@ -30,7 +32,7 @@ const extractImageDataToJson = async (
 
       CAMPOS DA RESPOSTA JSON:
       {
-        "category": "deve ser APENAS uma das opções: ${categories.join(", ")}",
+        "category": "deve ser APENAS uma das opções: ${categoryNames}",
         "local": "nome do estabelecimento se identificado",
         "price": "valor total em centavos (SEM vírgula ou ponto). Ex: 1000 para R$10.00, 2550 para R$25.50",
         "timestamp": "formato ISO 8601: YYYY-MM-DDTHH:mm:ss (horário local de Brasília UTC-3, SEM indicador de fuso). Retorne SOMENTE o timestamp, sem qualquer texto adicional ou explicação.",

@@ -3,9 +3,16 @@ import * as firestore from "firebase/firestore";
 import { JSONResponse } from "../types";
 import { receipties } from "../api/firestore";
 import { MainStackParamList } from "../types/navigation";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useCallback } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { Text, View, FlatList, ActivityIndicator } from "react-native";
+import {
+  Text,
+  View,
+  FlatList,
+  ActivityIndicator,
+  ScrollView,
+  RefreshControl,
+} from "react-native";
 import StackedBarChartScreen from "../components/Home/StackedBarChart";
 import { CategoriesContext } from "../contexts/CategoriesContext";
 import { AuthContext } from "../contexts/AuthContext";
@@ -14,6 +21,7 @@ const Home = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
   const [balance, setBalance] = useState<number>(0);
   const [receiptsList, setReceiptsList] = useState<JSONResponse[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
   const { categories } = useContext(CategoriesContext);
   const { user, loadingUser } = useContext(AuthContext);
 
@@ -52,14 +60,24 @@ const Home = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
     count();
   }, [receiptsList]);
 
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchReceipts();
+    setRefreshing(false);
+  }, [user?.uid]);
+
   return (
-    <View style={styles.container}>
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       {isLoading ? (
         <View style={styles.container}>
           <ActivityIndicator size={"large"} />
         </View>
       ) : (
-        <View style={{ ...styles.container }}>
+        <View style={styles.container}>
           <View
             style={{
               alignSelf: "flex-start",
@@ -88,6 +106,7 @@ const Home = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
           ) : (
             <FlatList
               data={receiptsList}
+              scrollEnabled={false}
               contentContainerStyle={{ flex: 1 }}
               renderItem={({ item }) => (
                 <View
@@ -114,7 +133,7 @@ const Home = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
           Go to Profile
         </Text>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 

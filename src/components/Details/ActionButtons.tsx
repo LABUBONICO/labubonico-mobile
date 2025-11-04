@@ -51,7 +51,7 @@ const ActionButtons = ({ response, navigation }: ActionButtonsProps) => {
       >
         <Text>Descartar</Text>
       </TouchableOpacity>
-      {response && response?.errorMessage ? (
+      {!response || response?.errorMessage ? (
         <TouchableOpacity
           style={styles.buttonIcon}
           onPress={() => navigation.goBack()}
