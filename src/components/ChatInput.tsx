@@ -13,14 +13,15 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { MainStackParamList } from "../types/navigation";
 import * as DocumentPicker from "expo-document-picker";
 import { paperTheme } from "../theme/theme";
+import { useState } from "react";
 
 type ChatInputProps = {
-  input: string;
-  setInput: (text: string) => void;
+  input?: string;
+  setInput?: (text: string) => void;
   navigation: NativeStackScreenProps<MainStackParamList>["navigation"];
-  file: DocumentPicker.DocumentPickerResult | null;
-  setFile: (file: DocumentPicker.DocumentPickerResult | null) => void;
-  handlerSend: () => Promise<void>;
+  file?: DocumentPicker.DocumentPickerResult | null;
+  setFile?: (file: DocumentPicker.DocumentPickerResult | null) => void;
+  handlerSend?: () => Promise<void>;
 };
 
 const ChatInput = ({
@@ -32,6 +33,7 @@ const ChatInput = ({
   handlerSend,
 }: ChatInputProps) => {
   const [permission, requestPermission] = useCameraPermissions();
+  const route = navigation.getState().routes.find((r) => r.name === "Chat");
 
   const handleOpenCamera = async () => {
     if (permission?.granted) {
@@ -68,7 +70,7 @@ const ChatInput = ({
       }
     }
 
-    imagePicked.assets && setFile(imagePicked);
+    imagePicked.assets && setFile?.(imagePicked);
   };
 
   return (
@@ -88,7 +90,7 @@ const ChatInput = ({
     >
       <View style={{ flex: 1 }}>
         <TextInput
-          autoFocus={true}
+          autoFocus={route ? true : false}
           style={baseStyles.input}
           value={input}
           placeholder="Peça ao Labubonico"
@@ -97,7 +99,7 @@ const ChatInput = ({
       </View>
 
       <TouchableOpacity
-        onPress={file ? () => setFile(null) : handlerFilePick}
+        onPress={file ? () => setFile?.(null) : handlerFilePick}
         style={styles.buttonIcon}
       >
         {!file ? (

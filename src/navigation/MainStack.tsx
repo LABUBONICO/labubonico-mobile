@@ -8,6 +8,8 @@ import Profile from "../screens/Profile";
 import { MainStackParamList } from "../types/navigation";
 import Categories from "../screens/Categories";
 import { navigationTheme, paperTheme } from "../theme/theme";
+import { TouchableOpacity } from "react-native";
+import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
 
@@ -46,7 +48,27 @@ const MainStack = ({
           },
         }}
       >
-        <Stack.Screen name="Home" component={Home} />
+        <Stack.Screen
+          options={({ navigation }) => ({
+            headerTitle: "  labubonico",
+            headerTitleStyle: {
+              fontFamily: "PPEditorialNew",
+              fontSize: 24,
+            },
+            headerRight: () => (
+              <TouchableOpacity
+                style={{
+                  marginRight: paperTheme.spacing.sm,
+                }}
+                onPress={() => navigation.navigate("Profile")}
+              >
+                <FontAwesome6 name="circle-user" size={24} color="black" />
+              </TouchableOpacity>
+            ),
+          })}
+          name="Home"
+          component={Home}
+        />
         <Stack.Screen
           options={{
             animation: "fade",

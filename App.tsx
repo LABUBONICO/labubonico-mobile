@@ -12,8 +12,8 @@ import { paperTheme } from "./src/theme/theme";
 
 export default function App() {
   useFonts({
-    Switzer: require("./assets/fonts/SwitzerSemibold.otf"),
     SwitzerBold: require("./assets/fonts/SwitzerBold.otf"),
+    SwitzerSemibold: require("./assets/fonts/SwitzerSemibold.otf"),
     SwitzerRegular: require("./assets/fonts/SwitzerRegular.otf"),
     PPEditorialNew: require("./assets/fonts/PPEditorialNew.otf"),
   });

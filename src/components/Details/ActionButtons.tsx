@@ -41,6 +41,7 @@ const ActionButtons = ({ response, navigation }: ActionButtonsProps) => {
       style={{
         flexDirection: "row",
         justifyContent: "space-between",
+        gap: paperTheme.spacing.md,
       }}
     >
       <Button

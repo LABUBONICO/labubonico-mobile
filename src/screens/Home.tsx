@@ -16,6 +16,9 @@ import {
 import StackedBarChartScreen from "../components/Home/StackedBarChart";
 import { CategoriesContext } from "../contexts/CategoriesContext";
 import { AuthContext } from "../contexts/AuthContext";
+import ChatInput from "../components/ChatInput";
+import { paperTheme } from "../theme/theme";
+import { formatPrice } from "../utils";
 
 const Home = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
   const [balance, setBalance] = useState<number>(0);
@@ -68,74 +71,72 @@ const Home = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
     setRefreshing(false);
   }, [user?.uid]);
 
-  return (
-    <ScrollView
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
-      {isLoading ? (
-        <View style={styles.container}>
-          <ActivityIndicator size={"large"} />
-        </View>
-      ) : (
-        <View style={styles.container}>
-          <View
-            style={{
-              alignSelf: "flex-start",
-              marginTop: 40,
-              borderBottomWidth: 2,
-              borderBottomColor: "black",
-              width: "90%",
-              marginInline: 20,
-            }}
-          >
-            <Text>Suas despesas do mês</Text>
-            <Text style={{ fontSize: 48, fontWeight: "bold" }}>
-              R$ {(balance || 0).toFixed(2)}
-            </Text>
-          </View>
-          <View style={{ height: 185, width: "100%" }}>
-            <StackedBarChartScreen
-              receipts={receiptsList}
-              categories={categories}
-            />
-          </View>
-          {receiptsList.length === 0 ? (
-            <View style={styles.container}>
-              <Text>Você não possui despesas cadastradas</Text>
-            </View>
-          ) : (
-            <FlatList
-              data={receiptsList}
-              scrollEnabled={false}
-              contentContainerStyle={{ flex: 1 }}
-              renderItem={({ item }) => (
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    marginBlock: 10,
-                    padding: 10,
-                    minWidth: "90%",
-                  }}
-                >
-                  <Text>{item.category}</Text>
-                  <Text>R$ {(item.price || 0).toFixed(2)}</Text>
-                </View>
-              )}
-            />
-          )}
-        </View>
-      )}
+  const getCategorieColor = (name: string) => {
+    const category = categories.find(
+      (categorie) => categorie.name.toUpperCase() === name.toUpperCase()
+    );
+    return category ? category.color : "#000000";
+  };
 
-      <View style={styles.containerRow}>
-        <Text onPress={() => navigation.navigate("Chat")}>Go to Chat</Text>
-        <Text onPress={() => navigation.navigate("Profile")}>
-          Go to Profile
-        </Text>
-      </View>
-    </ScrollView>
+  return (
+    <View style={styles.container}>
+      <ScrollView
+        style={{ flex: 1, width: "100%" }}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        {isLoading ? (
+          <ActivityIndicator size={"large"} />
+        ) : (
+          <View style={{ alignItems: "center", gap: paperTheme.spacing.md }}>
+            <Text
+              variant="headlineLarge"
+              style={{ paddingBottom: paperTheme.spacing.xl }}
+            >
+              R$ {formatPrice(balance)}
+            </Text>
+            <View style={{ height: 185, width: "100%" }}>
+              <StackedBarChartScreen
+                receipts={receiptsList}
+                categories={categories}
+              />
+            </View>
+            {receiptsList.length === 0 ? (
+              <View style={styles.container}>
+                <Text>Você não possui despesas cadastradas</Text>
+              </View>
+            ) : (
+              <FlatList
+                data={receiptsList}
+                scrollEnabled={false}
+                contentContainerStyle={{ flex: 1, gap: paperTheme.spacing.md }}
+                renderItem={({ item }) => (
+                  <View style={styles.item}>
+                    <View
+                      style={{
+                        backgroundColor: getCategorieColor(item.category),
+                        height: 40,
+                        width: 40,
+                        borderRadius: paperTheme.borderRadius.sm,
+                      }}
+                    />
+                    <Text variant="titleLarge" style={{ flex: 1 }}>
+                      {item.category}
+                    </Text>
+                    <Text variant="titleMedium">
+                      R$ {formatPrice(item.price)}
+                    </Text>
+                  </View>
+                )}
+              />
+            )}
+          </View>
+        )}
+      </ScrollView>
+      <ChatInput navigation={navigation} />
+    </View>
   );
 };
 

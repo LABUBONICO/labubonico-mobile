@@ -39,6 +39,16 @@ const styles = StyleSheet.create({
     borderRadius: paperTheme.borderRadius.md,
     gap: paperTheme.spacing.md,
   },
+  item: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: paperTheme.spacing.md,
+    gap: paperTheme.spacing.md,
+    width: "100%",
+    backgroundColor: paperTheme.colors.surface,
+    borderRadius: paperTheme.borderRadius.md,
+  },
 
   containerRow: {
     gap: 10,

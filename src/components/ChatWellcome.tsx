@@ -23,7 +23,7 @@ const ChatWellcome = ({
           height: 30,
         }}
       />
-      <Text variant="headlineLarge" style={{ textAlign: "center" }}>
+      <Text variant="headlineMedium" style={{ textAlign: "center" }}>
         Oi! Como posso te ajudar hoje?
       </Text>
       <View style={styles.wellcomeButtonsContainer}>

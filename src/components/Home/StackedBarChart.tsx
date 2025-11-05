@@ -1,7 +1,10 @@
 import React, { useState, useMemo } from "react";
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { JSONResponse } from "../../types";
 import { Category } from "../../contexts/CategoriesContext";
+import { paperTheme } from "../../theme/theme";
+import { Button, Text } from "react-native-paper";
+import { formatPrice } from "../../utils";
 
 interface StackedBarChartProps {
   receipts?: JSONResponse[];
@@ -194,56 +197,13 @@ const StackedBarChartScreen: React.FC<StackedBarChartProps> = ({
     );
 
   return (
-    <View style={{ flex: 1 }}>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={[styles.button, viewMode === "days" && styles.buttonActive]}
-          onPress={() => setViewMode("days")}
-        >
-          <Text
-            style={[
-              styles.buttonText,
-              viewMode === "days" && styles.buttonTextActive,
-            ]}
-          >
-            Dias
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.button, viewMode === "weeks" && styles.buttonActive]}
-          onPress={() => setViewMode("weeks")}
-        >
-          <Text
-            style={[
-              styles.buttonText,
-              viewMode === "weeks" && styles.buttonTextActive,
-            ]}
-          >
-            Semanas
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.button, viewMode === "months" && styles.buttonActive]}
-          onPress={() => setViewMode("months")}
-        >
-          <Text
-            style={[
-              styles.buttonText,
-              viewMode === "months" && styles.buttonTextActive,
-            ]}
-          >
-            Meses
-          </Text>
-        </TouchableOpacity>
-      </View>
+    <View style={{ flex: 1, gap: paperTheme.spacing.xl }}>
       <View style={styles.container}>
         {data.map((item, idx) => (
           <View key={idx} style={styles.barContainer}>
-            <View style={styles.labelContainer}>
-              <Text style={styles.dayTotal}>
-                R$ {(item.total as number).toFixed(2)}
-              </Text>
-            </View>
+            <Text variant="bodyMedium">
+              {Math.floor((item.total as number) / 100)}
+            </Text>
             <View style={styles.stackedBar}>
               {categories.map((cat) => {
                 const height = (((item[cat.name] || 0) as number) / max) * 100;
@@ -258,9 +218,47 @@ const StackedBarChartScreen: React.FC<StackedBarChartProps> = ({
                 ) : null;
               })}
             </View>
-            <Text style={styles.label}>{item.label}</Text>
+            <Text variant="bodyMedium">{item.label}</Text>
           </View>
         ))}
+      </View>
+      <View style={styles.buttonContainer}>
+        <Button
+          {...paperTheme.buttons.small}
+          buttonColor={
+            viewMode === "days"
+              ? paperTheme.colors.primary
+              : paperTheme.colors.surface
+          }
+          style={{ flex: 1 }}
+          onPress={() => setViewMode("days")}
+        >
+          Dias
+        </Button>
+        <Button
+          {...paperTheme.buttons.small}
+          buttonColor={
+            viewMode === "weeks"
+              ? paperTheme.colors.primary
+              : paperTheme.colors.surface
+          }
+          style={{ flex: 1 }}
+          onPress={() => setViewMode("weeks")}
+        >
+          Semanas
+        </Button>
+        <Button
+          {...paperTheme.buttons.small}
+          buttonColor={
+            viewMode === "months"
+              ? paperTheme.colors.primary
+              : paperTheme.colors.surface
+          }
+          style={{ flex: 1 }}
+          onPress={() => setViewMode("months")}
+        >
+          Meses
+        </Button>
       </View>
     </View>
   );
@@ -271,10 +269,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
-    paddingVertical: 12,
-    paddingHorizontal: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
+    gap: paperTheme.spacing.sm,
   },
   button: {
     paddingVertical: 8,
@@ -295,10 +290,10 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    padding: 10,
     flexDirection: "row",
     gap: 2,
     justifyContent: "space-between",
+    marginTop: paperTheme.spacing.xl,
   },
   barContainer: {
     marginVertical: 10,
@@ -306,6 +301,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     height: "100%",
     flex: 1,
+    gap: 4,
   },
   labelContainer: {
     flexDirection: "row",
@@ -321,7 +317,8 @@ const styles = StyleSheet.create({
   dayTotal: { fontSize: 12, fontWeight: "500", color: "#666" },
   stackedBar: {
     flexDirection: "column-reverse",
-    height: "100%",
+    maxHeight: "100%",
+
     width: "100%",
     gap: 2,
   },

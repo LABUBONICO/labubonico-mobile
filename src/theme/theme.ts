@@ -16,10 +16,15 @@ const fonts = {
   // Headline styles
   headlineLarge: {
     fontFamily: "SwitzerBold",
+    fontSize: 48,
+    lineHeight: 56,
+  },
+  headlineMedium: {
+    fontFamily: "SwitzerBold",
     fontSize: 32,
     lineHeight: 38,
   },
-  headlineMedium: {
+  headlineSmall: {
     fontFamily: "SwitzerBold",
     fontSize: 20,
     lineHeight: 24,
@@ -94,15 +99,22 @@ const buttons = {
     textColor: colors.onPrimary,
     style: { width: "100%" as any },
     contentStyle: { padding: spacing.lg },
-    labelStyle: fonts.headlineMedium,
+    labelStyle: fonts.headlineSmall,
   },
   outlined: {
     mode: "outlined" as const,
     textColor: colors.onPrimary,
     style: { width: "100%" as any, borderColor: colors.onPrimary },
     contentStyle: { padding: spacing.lg },
-    labelStyle: fonts.headlineMedium,
+    labelStyle: fonts.headlineSmall,
     borderWidth: 1,
+  },
+  small: {
+    mode: "text" as const,
+    buttonColor: colors.primary,
+    textColor: colors.onPrimary,
+    contentStyle: { padding: spacing.xs },
+    labelStyle: fonts.bodyMedium,
   },
 };
 
