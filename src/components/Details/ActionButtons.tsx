@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 import { Button, Text } from "react-native-paper";
 import { JSONResponse } from "../../types";
@@ -7,6 +7,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import * as firestore from "firebase/firestore";
 import { receipties } from "../../api/firestore";
 import styles from "../../styles";
+import { AuthContext } from "../../contexts/AuthContext";
 import { paperTheme } from "../../theme/theme";
 
 type ActionButtonsProps = {
@@ -18,11 +19,16 @@ type ActionButtonsProps = {
 };
 const ActionButtons = ({ response, navigation }: ActionButtonsProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const { user } = useContext(AuthContext);
 
   const saveDetails = async () => {
     try {
       setIsLoading(true);
-      await firestore.addDoc(receipties, response);
+      await firestore.addDoc(receipties, {
+        ...response,
+        userId: user?.uid,
+        createdAt: new Date(),
+      });
       navigation.popToTop();
     } catch (error) {
       console.error("Error saving document:", error);

@@ -9,7 +9,7 @@ import {
 import styles from "../styles";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { MainStackParamList } from "../types/navigation";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { extractImageDataToJson } from "../utils/analyzeImage";
 import { JSONResponse } from "../types";
 
@@ -17,6 +17,7 @@ import ActionButtons from "../components/Details/ActionButtons";
 import LoadingError from "../components/Details/LoadingError";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import DetailsTextInput from "../components/Details/DetailsTextInput";
+import { CategoriesContext } from "../contexts/CategoriesContext";
 
 const Details = ({
   route,
@@ -25,12 +26,16 @@ const Details = ({
   const { photo } = route.params;
   const [response, setResponse] = useState<JSONResponse | undefined>(undefined);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const { categories } = useContext(CategoriesContext);
 
   useEffect(() => {
     const loadDetails = async () => {
       try {
         console.log("Extracting data from photo...");
-        const response = await extractImageDataToJson(photo?.base64 || "");
+        const response = await extractImageDataToJson(
+          photo?.base64 || "",
+          categories
+        );
         setResponse({
           ...response,
           timestamp: new Date(String(response.timestamp)),
