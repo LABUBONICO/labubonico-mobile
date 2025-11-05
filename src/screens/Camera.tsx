@@ -1,10 +1,12 @@
-import { Image, Modal, Text, TouchableOpacity, View } from "react-native";
+import { Image, Modal, TouchableOpacity, View } from "react-native";
+import { Button, Text } from "react-native-paper";
 import styles from "../styles";
 import { CameraCapturedPicture, CameraView } from "expo-camera";
 import { useRef, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { MainStackParamList } from "../types/navigation";
+import { paperTheme } from "../theme/theme";
 
 const Camera = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
   const [flashOn, setFlashOn] = useState(false);
@@ -23,7 +25,12 @@ const Camera = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
   return (
     <View style={styles.container}>
       <CameraView
-        style={{ flex: 1, width: "100%", height: "100%" }}
+        style={{
+          flex: 1,
+          width: "100%",
+          height: "100%",
+          borderRadius: paperTheme.borderRadius.lg,
+        }}
         facing="back"
         enableTorch={flashOn}
         ref={cameraRef}
@@ -34,7 +41,7 @@ const Camera = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
           bottom: 50,
           left: 20,
           right: 20,
-          gap: 10,
+          gap: paperTheme.spacing.xl,
           alignItems: "center",
         }}
       >
@@ -42,14 +49,22 @@ const Camera = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
           style={{
             width: "100%",
             flexDirection: "row",
-            justifyContent: "space-between",
+            justifyContent: "space-around",
+            alignItems: "center",
           }}
         >
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Ionicons name="close" size={24} color="white" />
+            <Ionicons name="close" size={32} color="white" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleTakePicture}>
-            <Ionicons name="camera" size={24} color="white" />
+          <TouchableOpacity
+            style={{
+              backgroundColor: paperTheme.colors.primary,
+              padding: paperTheme.spacing.lg,
+              borderRadius: paperTheme.borderRadius.full,
+            }}
+            onPress={handleTakePicture}
+          >
+            <Ionicons name="camera" size={32} color="black" />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setFlashOn((prev) => !prev)}>
             <Ionicons
@@ -59,7 +74,7 @@ const Camera = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
             />
           </TouchableOpacity>
         </View>
-        <Text style={{ color: "white" }}>
+        <Text variant="labelMedium" style={{ color: "white" }}>
           Tire fotos de notas fiscais, boletos...
         </Text>
       </View>
@@ -69,10 +84,15 @@ const Camera = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
           {photo && (
             <Image
               source={{ uri: photo.uri }}
-              style={{ width: "100%", height: "100%" }}
+              style={{
+                width: "100%",
+                height: "100%",
+                borderRadius: paperTheme.borderRadius.lg,
+              }}
               resizeMode="contain"
             />
           )}
+
           <View
             style={{
               position: "absolute",
@@ -81,18 +101,22 @@ const Camera = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
               right: 20,
               flexDirection: "row",
               justifyContent: "space-between",
+              alignItems: "center",
+              width: "100%",
             }}
           >
-            <TouchableOpacity
-              style={styles.buttonIcon}
-              onPress={() => {
-                setPhoto(null);
-              }}
+            <Button
+              {...paperTheme.buttons.contained}
+              buttonColor={paperTheme.colors.surface}
+              style={{ flex: 1 }}
+              onPress={() => setPhoto(null)}
             >
-              <Ionicons name="trash" size={24} color="black" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.buttonIcon, { marginTop: 10 }]}
+              Cancelar
+            </Button>
+            <Button
+              {...paperTheme.buttons.contained}
+              buttonColor={paperTheme.colors.success}
+              style={{ flex: 1 }}
               onPress={() => {
                 if (photo) {
                   navigation.navigate("Details", { photo });
@@ -100,8 +124,8 @@ const Camera = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
                 }
               }}
             >
-              <Ionicons name="send" size={24} color="black" />
-            </TouchableOpacity>
+              Continuar
+            </Button>
           </View>
         </View>
       </Modal>

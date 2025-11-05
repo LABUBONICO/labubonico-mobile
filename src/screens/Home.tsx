@@ -5,7 +5,8 @@ import { receipties } from "../api/firestore";
 import { MainStackParamList } from "../types/navigation";
 import { useEffect, useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { Text, View, FlatList, ActivityIndicator } from "react-native";
+import { View, FlatList, ActivityIndicator } from "react-native";
+import { Text } from "react-native-paper";
 
 const Home = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
   const [balance, setBalance] = useState<number>(0);
@@ -33,7 +34,9 @@ const Home = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
 
   const count = () => {
     receiptsList.forEach((element) => {
-      setBalance((prev) => prev + element.price);
+      if (element.price !== undefined && element.price !== null) {
+        setBalance((prev) => prev + element.price);
+      }
     });
   };
   useEffect(() => {
@@ -61,7 +64,7 @@ const Home = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
           >
             <Text>Suas despesas do mês</Text>
             <Text style={{ fontSize: 48, fontWeight: "bold" }}>
-              R$ {balance.toFixed(2)}
+              R$ {(balance || 0).toFixed(2)}
             </Text>
           </View>
           {receiptsList.length === 0 ? (
@@ -83,7 +86,7 @@ const Home = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
                   }}
                 >
                   <Text>{item.category}</Text>
-                  <Text>R$ {item.price.toFixed(2)}</Text>
+                  <Text>R$ {(item.price || 0).toFixed(2)}</Text>
                 </View>
               )}
             />

@@ -5,20 +5,32 @@ import { AuthProvider } from "./src/contexts/AuthContext";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SheetProvider } from "react-native-actions-sheet";
 import { CategoriesProvider } from "./src/contexts/CategoriesContext";
+import { useFonts } from "expo-font";
 import "./src/sheets/sheets";
+import { PaperProvider } from "react-native-paper";
+import { paperTheme } from "./src/theme/theme";
 
 export default function App() {
+  useFonts({
+    Switzer: require("./assets/fonts/SwitzerSemibold.otf"),
+    SwitzerBold: require("./assets/fonts/SwitzerBold.otf"),
+    SwitzerRegular: require("./assets/fonts/SwitzerRegular.otf"),
+    PPEditorialNew: require("./assets/fonts/PPEditorialNew.otf"),
+  });
+
   return (
     <AuthProvider>
       <CategoriesProvider>
-        <SafeAreaProvider>
-          <GestureHandlerRootView style={{ flex: 1 }}>
-            <SheetProvider context="global">
-              <RootNavigation />
-              <StatusBar style="auto" />
-            </SheetProvider>
-          </GestureHandlerRootView>
-        </SafeAreaProvider>
+        <PaperProvider theme={paperTheme}>
+          <SafeAreaProvider>
+            <GestureHandlerRootView style={{ flex: 1 }}>
+              <SheetProvider context="global">
+                <RootNavigation />
+                <StatusBar style="auto" />
+              </SheetProvider>
+            </GestureHandlerRootView>
+          </SafeAreaProvider>
+        </PaperProvider>
       </CategoriesProvider>
     </AuthProvider>
   );

@@ -1,6 +1,7 @@
 import {
   ActivityIndicator,
   FlatList,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
@@ -13,6 +14,37 @@ import ActionSheet, {
 import styles, { CATEGORY_COLORS } from "../../styles";
 import { useContext, useState } from "react";
 import { CategoriesContext } from "../../contexts/CategoriesContext";
+import { paperTheme } from "../../theme/theme";
+import { Button } from "react-native-paper";
+
+const sheetStyles = StyleSheet.create({
+  container: {
+    padding: paperTheme.spacing.xl,
+    height: "auto",
+  },
+  colorList: {
+    maxHeight: 25,
+    marginTop: paperTheme.spacing.sm,
+  },
+  colorListContent: {
+    gap: paperTheme.spacing.md,
+    justifyContent: "space-between",
+  },
+  categoryInput: {
+    borderWidth: 1,
+    padding: paperTheme.spacing.xl,
+    backgroundColor: paperTheme.colors.surface,
+    borderRadius: paperTheme.borderRadius.md,
+    height: 70,
+    width: "100%",
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+  },
+});
 
 const CategorieSheet = () => {
   const payload = useSheetPayload("CategorieSheet");
@@ -50,61 +82,64 @@ const CategorieSheet = () => {
       updatedCategories.splice(payload.index, 1);
       updateCategories(updatedCategories);
       ref.current.hide();
+    } else {
+      ref.current.hide();
     }
   };
 
   return (
-    <ActionSheet
-      containerStyle={{
-        padding: 32,
-        height: 250,
-        gap: 20,
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <View style={{ gap: 20, flex: 1, justifyContent: "space-between" }}>
+    <ActionSheet containerStyle={sheetStyles.container}>
+      <View style={{ gap: paperTheme.spacing.xl, alignItems: "center" }}>
         <FlatList
           data={CATEGORY_COLORS}
           horizontal
-          style={{ maxHeight: 25, width: "100%" }}
-          contentContainerStyle={{ gap: 10, justifyContent: "space-between" }}
+          style={sheetStyles.colorList}
+          contentContainerStyle={sheetStyles.colorListContent}
           renderItem={({ item }) => (
             <TouchableOpacity
               onPress={() => setColor(item)}
-              style={{
-                backgroundColor: item,
-                height: 25,
-                width: 25,
-                borderRadius: 100,
-                borderWidth: color === item ? 3 : 0,
-                borderColor: "#000",
-              }}
+              style={[
+                {
+                  height: 25,
+                  width: 25,
+                  borderRadius: 100,
+                  backgroundColor: item,
+                  borderWidth: 3,
+                  borderColor: color === item ? "#000" : "transparent",
+                },
+              ]}
             />
           )}
         />
         <TextInput
           style={[
             styles.input,
-            { borderColor: emptyNameError ? "red" : "#ccc" },
+            sheetStyles.categoryInput,
+            { borderColor: emptyNameError ? "red" : "transparent" },
           ]}
           placeholder="Nome da categoria"
           value={name}
           onChangeText={setName}
         />
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            width: "100%",
-          }}
-        >
-          <TouchableOpacity onPress={handleDelete}>
-            <Text>Excluir</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleSave}>
-            {loading ? <ActivityIndicator size="small" /> : <Text>Salvar</Text>}
-          </TouchableOpacity>
+        <View style={sheetStyles.buttonContainer}>
+          <Button
+            {...paperTheme.buttons.contained}
+            buttonColor={paperTheme.colors.surface}
+            style={{ flex: 1 }}
+            onPress={handleDelete}
+            loading={loading}
+          >
+            Excluir
+          </Button>
+          <Button
+            {...paperTheme.buttons.contained}
+            buttonColor={paperTheme.colors.success}
+            style={{ flex: 1 }}
+            onPress={handleSave}
+            loading={loading}
+          >
+            Salvar
+          </Button>
         </View>
       </View>
     </ActionSheet>

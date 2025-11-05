@@ -1,6 +1,7 @@
-import styles from "../styles";
+import { paperTheme } from "../theme/theme";
 import { Message } from "../types";
-import { Image, Text, View } from "react-native";
+import { Image, StyleSheet, View } from "react-native";
+import { Text } from "react-native-paper";
 
 const ChatMessage = ({ role, content, file }: Message) => {
   return (
@@ -17,11 +18,34 @@ const ChatMessage = ({ role, content, file }: Message) => {
           />
         )
       )}
-      <Text style={role != "user" ? { color: "#f1f1f1" } : undefined}>
-        {content}
-      </Text>
+      {role != "user" && (
+        <Image
+          source={require("../../assets/images/labubonico_logo.png")}
+          style={{
+            width: 20,
+            height: 20,
+            marginBottom: paperTheme.spacing.sm,
+          }}
+        />
+      )}
+      <Text variant="titleLarge">{content}</Text>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  messageUser: {
+    textAlign: "justify",
+    padding: paperTheme.spacing.md,
+    maxWidth: "75%",
+    alignSelf: "flex-end",
+    backgroundColor: paperTheme.colors.surface,
+  },
+  messageAgent: {
+    textAlign: "justify",
+    padding: paperTheme.spacing.md,
+    alignSelf: "flex-start",
+  },
+});
 
 export default ChatMessage;
