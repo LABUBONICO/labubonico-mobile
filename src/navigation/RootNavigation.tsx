@@ -25,7 +25,7 @@ const RootNavigation = () => {
           ? paperTheme.colors.primary
           : paperTheme.colors.background,
       }}
-      edges={["top", "bottom"]}
+      edges={["bottom"]}
     >
       {user ? <MainStack chat={chat} setChat={setChat} /> : <Login />}
     </SafeAreaView>

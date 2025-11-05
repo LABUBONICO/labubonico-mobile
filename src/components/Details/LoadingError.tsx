@@ -1,6 +1,7 @@
 import { JSONResponse } from "../../types";
 import { Image, View } from "react-native";
 import { Text } from "react-native-paper";
+import { paperTheme } from "../../theme/theme";
 
 type LoadingErrorProps = {
   response: JSONResponse | undefined;
@@ -8,23 +9,19 @@ type LoadingErrorProps = {
 
 const LoadingError = ({ response }: LoadingErrorProps) => {
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Image
-        source={require("../../../assets/images/details_loading.png")}
-        style={{
-          width: "100%",
-          height: "100%",
-          flex: 1,
-          position: "absolute",
-          top: 0,
-          left: 0,
-        }}
-      />
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        gap: paperTheme.spacing.md,
+      }}
+    >
       <Image
         source={require("../../../assets/images/labubonico_logo.png")}
         style={{ width: 40, height: 40 }}
       />
-      <Text>
+      <Text variant="displayMedium" style={{ textAlign: "center" }}>
         {response ? response.errorMessage : "labubonico está pensando..."}
       </Text>
     </View>

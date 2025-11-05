@@ -16,39 +16,12 @@ import { useContext, useState } from "react";
 import { CategoriesContext } from "../../contexts/CategoriesContext";
 import { paperTheme } from "../../theme/theme";
 import { Button } from "react-native-paper";
-
-const sheetStyles = StyleSheet.create({
-  container: {
-    padding: paperTheme.spacing.xl,
-    height: "auto",
-  },
-  colorList: {
-    maxHeight: 25,
-    marginTop: paperTheme.spacing.sm,
-  },
-  colorListContent: {
-    gap: paperTheme.spacing.md,
-    justifyContent: "space-between",
-  },
-  categoryInput: {
-    borderWidth: 1,
-    padding: paperTheme.spacing.xl,
-    backgroundColor: paperTheme.colors.surface,
-    borderRadius: paperTheme.borderRadius.md,
-    height: 70,
-    width: "100%",
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    width: "100%",
-  },
-});
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const CategorieSheet = () => {
   const payload = useSheetPayload("CategorieSheet");
   const ref = useSheetRef("CategorieSheet");
+  const insets = useSafeAreaInsets();
 
   const { categories, updateCategories, loading } =
     useContext(CategoriesContext);
@@ -88,7 +61,12 @@ const CategorieSheet = () => {
   };
 
   return (
-    <ActionSheet containerStyle={sheetStyles.container}>
+    <ActionSheet
+      containerStyle={{
+        ...sheetStyles.container,
+        paddingBottom: insets.bottom + paperTheme.spacing.xl,
+      }}
+    >
       <View style={{ gap: paperTheme.spacing.xl, alignItems: "center" }}>
         <FlatList
           data={CATEGORY_COLORS}
@@ -145,5 +123,34 @@ const CategorieSheet = () => {
     </ActionSheet>
   );
 };
+
+const sheetStyles = StyleSheet.create({
+  container: {
+    padding: paperTheme.spacing.xl,
+    height: "auto",
+  },
+  colorList: {
+    maxHeight: 25,
+    marginTop: paperTheme.spacing.sm,
+  },
+  colorListContent: {
+    gap: paperTheme.spacing.md,
+    justifyContent: "space-between",
+  },
+  categoryInput: {
+    borderWidth: 1,
+    padding: paperTheme.spacing.xl,
+    backgroundColor: paperTheme.colors.surface,
+    borderRadius: paperTheme.borderRadius.md,
+    height: 70,
+    width: "100%",
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+  },
+});
 
 export default CategorieSheet;
