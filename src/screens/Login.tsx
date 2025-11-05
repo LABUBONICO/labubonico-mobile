@@ -104,6 +104,7 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     alignItems: "center",
+    marginTop: paperTheme.spacing.xl,
   },
   logo: {
     width: 25,

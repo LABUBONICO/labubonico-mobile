@@ -117,14 +117,25 @@ const Home = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
                     <View
                       style={{
                         backgroundColor: getCategorieColor(item.category),
-                        height: 40,
-                        width: 40,
+                        height: 50,
+                        width: 50,
                         borderRadius: paperTheme.borderRadius.sm,
                       }}
                     />
-                    <Text variant="titleLarge" style={{ flex: 1 }}>
-                      {item.category}
-                    </Text>
+                    <View
+                      style={{
+                        flex: 1,
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Text variant="titleLarge">{item.local}</Text>
+                      <Text
+                        variant="bodyMedium"
+                        style={{ color: getCategorieColor(item.category) }}
+                      >
+                        {item.category}
+                      </Text>
+                    </View>
                     <Text variant="titleMedium">
                       R$ {formatPrice(item.price)}
                     </Text>
