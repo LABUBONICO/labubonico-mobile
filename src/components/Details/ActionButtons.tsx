@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 import { JSONResponse } from "../../types";
 import { MainStackParamList } from "../../types/navigation";
@@ -6,6 +6,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import * as firestore from "firebase/firestore";
 import { receipties } from "../../api/firestore";
 import styles from "../../styles";
+import { AuthContext } from "../../contexts/AuthContext";
 
 type ActionButtonsProps = {
   response: JSONResponse | undefined;
@@ -16,11 +17,16 @@ type ActionButtonsProps = {
 };
 const ActionButtons = ({ response, navigation }: ActionButtonsProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const { user } = useContext(AuthContext);
 
   const saveDetails = async () => {
     try {
       setIsLoading(true);
-      await firestore.addDoc(receipties, response);
+      await firestore.addDoc(receipties, {
+        ...response,
+        userId: user?.uid,
+        createdAt: new Date(),
+      });
       navigation.popToTop();
     } catch (error) {
       console.error("Error saving document:", error);
@@ -45,7 +51,7 @@ const ActionButtons = ({ response, navigation }: ActionButtonsProps) => {
       >
         <Text>Descartar</Text>
       </TouchableOpacity>
-      {response && response?.errorMessage ? (
+      {!response || response?.errorMessage ? (
         <TouchableOpacity
           style={styles.buttonIcon}
           onPress={() => navigation.goBack()}

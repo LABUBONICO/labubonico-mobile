@@ -3,33 +3,52 @@ import * as firestore from "firebase/firestore";
 import { JSONResponse } from "../types";
 import { receipties } from "../api/firestore";
 import { MainStackParamList } from "../types/navigation";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState, useCallback } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { Text, View, FlatList, ActivityIndicator } from "react-native";
+import {
+  Text,
+  View,
+  FlatList,
+  ActivityIndicator,
+  ScrollView,
+  RefreshControl,
+} from "react-native";
+import StackedBarChartScreen from "../components/Home/StackedBarChart";
+import { CategoriesContext } from "../contexts/CategoriesContext";
+import { AuthContext } from "../contexts/AuthContext";
 
 const Home = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
   const [balance, setBalance] = useState<number>(0);
   const [receiptsList, setReceiptsList] = useState<JSONResponse[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+  const { categories } = useContext(CategoriesContext);
+  const { user, loadingUser } = useContext(AuthContext);
 
   const fetchReceipts = async () => {
     try {
       setIsLoading(true);
-      const snapshot = await firestore.getDocs(receipties);
-      const docs = snapshot.docs.map((doc) => ({
-        ...doc.data(),
-      })) as JSONResponse[];
-      console.log(docs);
-      setReceiptsList(docs);
+      const q = firestore.query(
+        receipties,
+        firestore.where("userId", "==", user?.uid)
+      );
+      const snapshot = await firestore.getDocs(q);
+      const receipts = snapshot.docs.map((doc) => doc.data() as JSONResponse);
+      setReceiptsList(receipts);
+      console.log("Receipts fetched successfully:", receipts);
     } catch (error) {
-      console.error(error);
+      console.error("Error fetching receipts:", error);
+      setReceiptsList([]);
     } finally {
       setIsLoading(false);
     }
   };
+
   useEffect(() => {
-    fetchReceipts();
-  }, []);
+    if (!loadingUser) {
+      fetchReceipts();
+    }
+  }, [loadingUser, user?.uid]);
 
   const count = () => {
     receiptsList.forEach((element) => {
@@ -41,14 +60,24 @@ const Home = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
     count();
   }, [receiptsList]);
 
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchReceipts();
+    setRefreshing(false);
+  }, [user?.uid]);
+
   return (
-    <View style={styles.container}>
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       {isLoading ? (
         <View style={styles.container}>
           <ActivityIndicator size={"large"} />
         </View>
       ) : (
-        <View style={{ ...styles.container }}>
+        <View style={styles.container}>
           <View
             style={{
               alignSelf: "flex-start",
@@ -64,6 +93,12 @@ const Home = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
               R$ {balance.toFixed(2)}
             </Text>
           </View>
+          <View style={{ height: 185, width: "100%" }}>
+            <StackedBarChartScreen
+              receipts={receiptsList}
+              categories={categories}
+            />
+          </View>
           {receiptsList.length === 0 ? (
             <View style={styles.container}>
               <Text>Você não possui despesas cadastradas</Text>
@@ -71,6 +106,7 @@ const Home = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
           ) : (
             <FlatList
               data={receiptsList}
+              scrollEnabled={false}
               contentContainerStyle={{ flex: 1 }}
               renderItem={({ item }) => (
                 <View
@@ -97,7 +133,7 @@ const Home = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
           Go to Profile
         </Text>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
