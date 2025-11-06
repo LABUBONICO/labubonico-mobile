@@ -1,5 +1,6 @@
 import { useContext, useState } from "react";
-import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, TouchableOpacity, View } from "react-native";
+import { Button, Text } from "react-native-paper";
 import { JSONResponse } from "../../types";
 import { MainStackParamList } from "../../types/navigation";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -7,6 +8,7 @@ import * as firestore from "firebase/firestore";
 import { receipties } from "../../api/firestore";
 import styles from "../../styles";
 import { AuthContext } from "../../contexts/AuthContext";
+import { paperTheme } from "../../theme/theme";
 
 type ActionButtonsProps = {
   response: JSONResponse | undefined;
@@ -37,35 +39,31 @@ const ActionButtons = ({ response, navigation }: ActionButtonsProps) => {
   return (
     <View
       style={{
-        position: "absolute",
-        bottom: 50,
-        left: 20,
-        right: 20,
         flexDirection: "row",
         justifyContent: "space-between",
+        gap: paperTheme.spacing.md,
       }}
     >
-      <TouchableOpacity
-        style={styles.buttonIcon}
+      <Button
+        {...paperTheme.buttons.contained}
+        buttonColor={paperTheme.colors.surface}
+        style={{ flex: 1 }}
         onPress={() => navigation.popToTop()}
       >
-        <Text>Descartar</Text>
-      </TouchableOpacity>
-      {!response || response?.errorMessage ? (
-        <TouchableOpacity
-          style={styles.buttonIcon}
-          onPress={() => navigation.goBack()}
+        Cancelar
+      </Button>
+      {response && (
+        <Button
+          {...paperTheme.buttons.contained}
+          buttonColor={paperTheme.colors.success}
+          style={{ flex: 1 }}
+          loading={isLoading}
+          onPress={
+            response?.errorMessage ? () => navigation.goBack() : saveDetails
+          }
         >
-          <Text>Tentar Novamente</Text>
-        </TouchableOpacity>
-      ) : (
-        <TouchableOpacity style={styles.buttonIcon} onPress={saveDetails}>
-          {isLoading ? (
-            <ActivityIndicator color="white" size={"small"} />
-          ) : (
-            <Text>Ok</Text>
-          )}
-        </TouchableOpacity>
+          {response?.errorMessage ? "Refazer" : "Salvar"}
+        </Button>
       )}
     </View>
   );

@@ -7,15 +7,75 @@ import Details from "../screens/Details";
 import Profile from "../screens/Profile";
 import { MainStackParamList } from "../types/navigation";
 import Categories from "../screens/Categories";
+import { navigationTheme, paperTheme } from "../theme/theme";
+import { TouchableOpacity } from "react-native";
+import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
 
-const MainStack = () => {
+const MainStack = ({
+  chat,
+  setChat,
+}: {
+  chat: boolean;
+  setChat: (chat: boolean) => void;
+}) => {
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="Chat" component={Chat} />
+    <NavigationContainer theme={navigationTheme}>
+      <Stack.Navigator
+        screenOptions={{
+          headerShadowVisible: false,
+          headerStyle: {
+            backgroundColor: chat
+              ? paperTheme.colors.primary
+              : paperTheme.colors.background,
+          },
+          contentStyle: {
+            backgroundColor: chat
+              ? paperTheme.colors.primary
+              : paperTheme.colors.background,
+          },
+        }}
+        screenListeners={{
+          state: (e) => {
+            const state = e.data.state;
+            if (state) {
+              const currentRoute = state.routes[state.index];
+              setChat(
+                currentRoute.name === "Chat" || currentRoute.name === "Camera"
+              );
+            }
+          },
+        }}
+      >
+        <Stack.Screen
+          options={({ navigation }) => ({
+            headerTitle: "  labubonico",
+            headerTitleStyle: {
+              fontFamily: "PPEditorialNew",
+              fontSize: 24,
+            },
+            headerRight: () => (
+              <TouchableOpacity
+                style={{
+                  marginRight: paperTheme.spacing.sm,
+                }}
+                onPress={() => navigation.navigate("Profile")}
+              >
+                <FontAwesome6 name="circle-user" size={24} color="black" />
+              </TouchableOpacity>
+            ),
+          })}
+          name="Home"
+          component={Home}
+        />
+        <Stack.Screen
+          options={{
+            animation: "fade",
+          }}
+          name="Chat"
+          component={Chat}
+        />
         <Stack.Screen name="Camera" component={Camera} />
         <Stack.Screen name="Details" component={Details} />
         <Stack.Screen name="Profile" component={Profile} />

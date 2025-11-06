@@ -2,22 +2,15 @@ import styles from "../styles";
 import ChatMessage from "../components/ChatMessage";
 import { model } from "../api/firebaseConfig";
 import { Message } from "../types";
-import { Ionicons } from "@expo/vector-icons";
 import { useRef, useState } from "react";
-import {
-  ActivityIndicator,
-  FlatList,
-  Image,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ActivityIndicator, FlatList, Text, View } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { MainStackParamList } from "../types/navigation";
-import { useCameraPermissions } from "expo-camera";
-import * as FileSystem from "expo-file-system/legacy";
+
+import ChatInput from "../components/ChatInput";
+import { paperTheme } from "../theme/theme";
+import ChatWellcome from "../components/ChatWellcome";
 
 const Chat = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
   const [input, setInput] = useState<string>("");
@@ -27,51 +20,12 @@ const Chat = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
   const [file, setFile] = useState<DocumentPicker.DocumentPickerResult | null>(
     null
   );
-  const [permission, requestPermission] = useCameraPermissions();
-
-  const handleOpenCamera = async () => {
-    if (permission?.granted) {
-      navigation.navigate("Camera");
-    } else {
-      const granted = await requestPermission();
-      if (granted) {
-        navigation.navigate("Camera");
-      }
-    }
-  };
 
   const chatRef = useRef(
     model.startChat({
       history: [],
     })
   );
-
-  const handlerFilePick = async () => {
-    const imagePicked = await DocumentPicker.getDocumentAsync({
-      type: ["image/*", "application/pdf"],
-      copyToCacheDirectory: true,
-      base64: true,
-    });
-
-    // If base64 is not available (mobile), convert file to base64
-    if (
-      imagePicked.assets &&
-      imagePicked.assets[0] &&
-      !imagePicked.assets[0].base64
-    ) {
-      try {
-        const base64Data = await FileSystem.readAsStringAsync(
-          imagePicked.assets[0].uri,
-          { encoding: "base64" }
-        );
-        imagePicked.assets[0].base64 = base64Data;
-      } catch (error) {
-        console.error("Error converting file to base64:", error);
-      }
-    }
-
-    setFile(imagePicked);
-  };
 
   const handlerSend = async () => {
     setIsChat(true);
@@ -131,7 +85,13 @@ const Chat = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View
+      style={{
+        ...styles.container,
+        backgroundColor: paperTheme.colors.primary,
+        flex: 1,
+      }}
+    >
       <View style={styles.containerList}>
         {isChat ? (
           <FlatList
@@ -149,13 +109,7 @@ const Chat = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
             )}
           />
         ) : (
-          <View style={styles.containerText}>
-            <Text style={styles.title}>LABUBONICO</Text>
-            <Text style={styles.introText}>
-              Peças dicas de como economizar, relatórios dos seus gastos, faça
-              sua lista de mercado e muito mais.
-            </Text>
-          </View>
+          <ChatWellcome setInput={setInput} />
         )}
       </View>
 
@@ -163,37 +117,14 @@ const Chat = ({ navigation }: NativeStackScreenProps<MainStackParamList>) => {
         {isLoading && <ActivityIndicator size={"large"} />}
       </View>
 
-      <View style={styles.containerRow}>
-        <TextInput
-          autoFocus={true}
-          style={styles.input}
-          value={input}
-          placeholder="Peça ao Labubonico"
-          onChangeText={setInput}
-        />
-
-        <TouchableOpacity
-          onPress={file ? () => setFile(null) : handlerFilePick}
-          style={styles.buttonIcon}
-        >
-          {!file ? (
-            <Ionicons name="attach" size={30} color="#000" />
-          ) : (
-            <Image
-              source={{ uri: file.assets?.[0].uri! }}
-              style={{ width: "100%", height: "100%", borderRadius: 100 }}
-            />
-          )}
-        </TouchableOpacity>
-
-        {/* change to navigate to camera screen */}
-        <TouchableOpacity
-          onPress={input ? handlerSend : handleOpenCamera}
-          style={styles.buttonIcon}
-        >
-          <Ionicons name={input ? "send" : "camera"} size={30} color="#000" />
-        </TouchableOpacity>
-      </View>
+      <ChatInput
+        input={input}
+        setInput={setInput}
+        navigation={navigation}
+        file={file}
+        setFile={setFile}
+        handlerSend={handlerSend}
+      />
     </View>
   );
 };

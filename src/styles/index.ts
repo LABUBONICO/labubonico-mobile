@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { paperTheme } from "../theme/theme";
 
 export const CATEGORY_COLORS = [
   "#1FC56F",
@@ -19,8 +20,36 @@ const styles = StyleSheet.create({
     width: "100%",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#f1f1f1",
+    padding: paperTheme.spacing.xl,
+    gap: paperTheme.spacing.md,
+    backgroundColor: "transparent",
   },
+  input: {
+    width: "100%",
+    fontFamily: "SwitzerRegular",
+    fontSize: 16,
+  },
+  button: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
+    padding: paperTheme.spacing.xl,
+    backgroundColor: paperTheme.colors.surface,
+    borderRadius: paperTheme.borderRadius.md,
+    gap: paperTheme.spacing.md,
+  },
+  item: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: paperTheme.spacing.md,
+    gap: paperTheme.spacing.md,
+    width: "100%",
+    backgroundColor: paperTheme.colors.surface,
+    borderRadius: paperTheme.borderRadius.md,
+  },
+
   containerRow: {
     gap: 10,
     paddingBlock: 10,
@@ -43,13 +72,7 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
   },
-  input: {
-    padding: 16,
-    borderWidth: 1,
-    borderRadius: 25,
-    minWidth: "70%",
-    borderColor: "#000",
-  },
+
   buttonIcon: {
     borderWidth: 1,
     borderRadius: 50,
@@ -94,14 +117,7 @@ const styles = StyleSheet.create({
   icon: {
     padding: 25,
   },
-  button: {
-    padding: 15,
-    borderRadius: 10,
-    backgroundColor: "#DDD",
-    width: "60%",
-    alignItems: "center",
-    flexDirection: "row",
-  },
+
   buttonText: {
     fontSize: 18,
     fontWeight: "bold",
